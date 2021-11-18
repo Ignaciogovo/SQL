@@ -1,0 +1,49 @@
+***Crear una tabla***
+
+CREATE TABLE persona(
+DNI VARCHAR(9) PRIMARY KEY,
+nombre VARCHAR (250) NOT NULL,
+id_trabajo INT,
+CONSTRAINT id_trabajo FOREIGN KEY (id_trabajo) REFERENCES trabajo(id)
+)
+
+
+**** Si tiene dos claves primarias******
+CREATE TABLE persona(
+DNI VARCHAR(9),
+nombre VARCHAR (250) NOT NULL,
+id_trabajo INT
+PRIMARY KEY (DNI,nombre)
+)
+
+
+***********modificar tablas**********
+ALTER TABLE  nombre_table ADD nueva_columna datatype;
+			  DROP COLUMN column name;
+			  MODIFY nombre_columna datatype;
+			  RENAME COLUMN column 1 to column 2;
+
+
+
+*******crear usuarios y permisos**********
+CREATE USER c##usuario IDENTIFIED BY contraseña;
+GRANT CREATE SESSION TO c##usuario;	   (se permite conectarse a la base de datos)
+GRANT CREATE TABLE TO c##usuario;	   (se permite crear tabla)
+GRANT ALTER ANY TABLE TO c##usuario;	   (se permite modificar cualquier tabla)
+GRANT INSERT ANY TABLE TO c##usuario;      (se permite introducir datos en cualquier tabla)
+GRANT UNLIMITED TABLESPACE TO c##usuario;
+
+
+*********INSERT*************
+INSERT INTO table_name(columna1,columna2,columna3.....) VALUES (valor1,'valor2',valor3.....);
+
+*****AYUDAS********
+restricción CHECK- no permite valores negativos para dicho campo
+ALTER TABLE ....... ADD precio NUMBER(6,2) CONSTRAINT C1_precio CHECK (precio>=0);
+
+
+
+******Cambiar un dato de la tabla******
+UPDATE INSTRUCTOR SET city='Markham' where ins_id=1
+*******Borrar una columna de una tabla*****
+DELETE FROM INSTRUCTOR where ins_id=2

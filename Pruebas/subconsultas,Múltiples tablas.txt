@@ -1,0 +1,17 @@
+1-Introduce una consulta que funcione utilizando un subselect para obtener todos los empleados cuyo salario sea mayor que el salario medio
+	select F_NAME from employees where salary > (SELECT AVG(salary) from employees);
+
+2-Introduce una Expresión de Columna que obtenga todos los registros de los empleados y el salario medio en cada fila.
+	select EMP_ID,salary, (select avg(salary)from employees) as salario_medio from employees where salary > (SELECT AVG(salary) from employees);
+
+3-Obtén sólo los registros de EMPLOYEES (“EMPLEADOS”) que correspondan a los departamentos que hay en la tabla DEPARTMENTS (“DEPARTAMENTOS”)
+	Select * from employees as n inner join departments as l on n.dep_id=l.dept_id_dep;
+
+4-Obtén sólo la lista de empleados de la ubicación L0002
+	Select emp_id, f_name, loc_id from employees as n inner join departments as l on n.dep_id=l.dept_id_dep and l.loc_id='L0002';
+
+5-Obtén sólo los registros de EMPLOYEES (“EMPLEADOS”) que correspondan a los departamentos que hay en la tabla DEPARTMENTS (“DEPARTAMENTOS”)
+	Select emp_id, f_name, dep_id from employees inner join departments on dep_id=dept_id_dep;
+
+
+

@@ -1,0 +1,53 @@
+Connetction methods
+	.cursor()
+	.commit()
+	.rollback()
+	.close()
+	
+Cursor methods
+	.callproc()
+	.execute()
+	.executemany()
+	.fetchone()
+	.fetchmany()
+	.fetchall()
+	.nextset()	
+	.arraysize()
+	.close()
+
+
+
+Create connection object
+	connection=	
+	connect('databasename',
+	'username','pswd')
+
+Create a cursor object
+	Cursor=connection.cursor()
+
+Run queries
+	Cursor.execute('select *
+	from mytable')
+	results=cursor.fetchall()
+Free couses
+Cursor.close()
+
+
+
+Ejemplo de creación de conexión de base de datos en phyton
+
+#Create dababase connection
+dsn = (
+	"DRIVER=((IBM DB2 ODBC DRIVER));"
+	"DATABASE={0};"
+	"HOSTNAME={1};"
+	"PORT={2};"
+	"PROTOCOL=TCPIP;"
+	"UID{3};"
+	"PWD={4};").format(dsn_database, dsn=hostname, dsn_port,dsn_uid, dsn_pwd)
+try:
+	conn =ibm_db.connect(dsn,"","")
+	print("Connectded!")
+except:
+	print ("Unable to connect to database")
+	
