@@ -1,0 +1,23 @@
+Seguridad. (Ser rancios)
+
+Añadir un login.
+	CREATE LOGIN alumno with password = 'Ab1234567'
+
+añadir un usuario.
+	USE nombre_BBDD
+	CREATE USER alumno for login alumno.
+Añadir Roles
+	USE nombre_BBDD
+	CREATE ROLE nombre_rol
+	GRANT SELECT on nombre_tabla to nombre_rol  ----> Permiso para hacer select a una tabla especifica.
+	
+		Para añadir un usuario a un rol existente.
+			ALTER ROLE nombre_rol ADD MENBER nombre_usuario;
+Añadir y revocar permisos.
+	GRANT SELECT ON nombre_tabla to usuario;
+	GRANT CREATE TABLE
+	GRANT ALTER ON nombre_tabla
+	GRANT INSERT on nombre_tabla
+
+			Para poder quitar un permiso se usa REVOKE.
+				Ejemplo:  REVOKE SELECT ON nombre_tabla to usuario;
