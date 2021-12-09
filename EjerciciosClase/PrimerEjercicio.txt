@@ -1,0 +1,55 @@
+create table personas (
+id int not null primary key,
+nombre varchar(34) not null,
+edad int not null
+);
+insert into personas values (1,'manuel',19);
+insert into personas values (2,'mario',45);
+insert into personas values (3,'alfonso',18);
+insert into personas values (4,'afl',5);
+insert into personas values (5,'paco',4);
+insert into personas values (6,'gonzalo',17);
+insert into personas values (7,'gato',17);
+insert into personas values (8,'felipe',26);
+
+
+
+
+
+
+select nombre, id, case when edad>=18 then 'si' else 'no' end as mayorEdad From personas;
+docker exec -it sql-server-db /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 12345Ab## -i /var/opt/mssql/backup/mayorEdad.sql
+
+
+
+
+
+
+
+
+USE arepazo
+--drop proc vermenu;
+GO
+CREATE PROCEDURE vermenu @tipoalimento INT, @categoria INT
+AS
+	IF @categoria is null
+		select * FROM menu where tipo = @tipoalimento
+		else
+		select * FROM menu WHERE tipo = @tipoalimento AND categoria = @categoria;
+GO
+
+
+
+USE arepazo
+--drop proc nombreYtelefono;
+GO
+CREATE or ALTER PROCEDURE nombreYtelefono @email varchar(100)
+as
+print @email
+declare @nombre as varchar(100)
+declare @telefono as varchar(100)
+select top 1 @nombre=Nombre from clientes where Email = @email
+select top 1 @telefono=Telefono from clientes where Email = @email
+print 'El teléfono de ' + @nombre + ' es ' + @telefono
+go
+exec nombreYtelefono 'juan@gmail.com'

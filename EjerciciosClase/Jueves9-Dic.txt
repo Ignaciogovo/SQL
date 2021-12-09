@@ -1,0 +1,89 @@
+1Procedimiento para calcular gastos de envio:
+
+CREATE OR ALTER PROCEDURE GastosEnvio @id_pedidos int
+as
+DECLARE @num1 as varchar(3)
+DECLARE @num2 as varchar(2)
+select @num1 = LEFT(Cod_postal,3) from Pedidos where Id= @id_pedidos
+select @num2 = LEFT(Cod_Postal,2) from Pedidos where Id= @id_pedidos
+if @num1 = '410'
+begin
+	update Pedidos set GastosEnvio=3.99 where Id=@id_pedidos
+end
+else
+	begin
+	if @num2 = '41'
+		begin
+				update Pedidos set GastosEnvio=5.99 where Id=@id_pedidos
+		end
+	else
+		begin
+				update Pedidos set GastosEnvio=9.99 where Id=@id_pedidos
+		end
+	end
+GO
+
+
+
+
+
+Crear trigger con el procedure
+
+CREATE OR ALTER TRIGGER modificacion_pedido
+ON pedidos
+for update 
+as
+begin
+	DECLARE @num as int
+	SELECT @num = id from inserted
+exec GastosEnvio @num 
+end
+
+
+
+
+
+
+
+
+
+
+CREATE TRIGGER actualizar total pedidos
+
+CREATE OR ALTER TRIGGER modificacion_total
+ON pedidos
+for update
+as
+if UPDATE(subtotal) or UPDATE(gastosenvio)
+begin
+  DECLARE @num as int
+  select @num =id from inserted
+  update Pedidos set Total=SubTotal + GastosEnvio where Id=@num
+end
+
+
+
+
+	Intención de modificar pedidos en linea y total pedidos
+
+
+	El procedure
+		CREATE OR ALTER procedure actualizar_total @num int
+	as
+	update Pedidos set Total= (select sum(PedidosLinea.Cantidad*PedidosLinea.PrecioVentaUnitario) 
+	FROM PedidosLinea 
+	where IdPedido = @num) where Id =@num
+	go
+
+
+
+
+CREATE OR ALTER TRIGGER actualizar_total
+ON pedidos
+for update
+as
+DECLARE @num as int
+select @num = id_pedido from inserted
+update Pedidos set Total= (select sum(PedidosLinea.Cantidad*PedidosLinea.PrecioVentaUnitario) 
+FROM PedidosLinea 
+where IdPedido = @num) where Id =@num
