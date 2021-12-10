@@ -36,6 +36,7 @@ as
 begin
 	DECLARE @num as int
 	SELECT @num = id from inserted
+if update(cod_postal)
 exec GastosEnvios @num 
 end
 
@@ -50,17 +51,21 @@ end
 
 CREATE TRIGGER actualizar total pedidos
 
+
 CREATE OR ALTER TRIGGER modificacion_total
 ON pedidos
 for update
 as
-if UPDATE(subtotal) or UPDATE(gastosenvio)
-begin
   DECLARE @num as int
   select @num =id from inserted
+if UPDATE(subtotal)
+begin
   update Pedidos set Total=SubTotal + GastosEnvio where Id=@num
 end
-
+if update(gastosenvio)
+begin
+  update Pedidos set Total=SubTotal + GastosEnvio where Id=@num
+end
 
 
 
