@@ -124,3 +124,91 @@ end
 
 insert PedidosLinea values (1,2,4,1.34,4)
 
+
+
+4 Añadir fecha de nacimiento y edad en la tabla clientes.
+Procedimineto para calcular la edad para guardarlo.
+
+
+		ALTER TABLE
+	ALTER TABLE CLIENTES ADD fecha_nacimiento date;
+	ALTER TABLE CLIENTES ADD edad int;
+
+		INSERT
+
+
+update clientes set fecha_nacimiento='12/19/2000' where Id=1;
+update clientes set fecha_nacimiento='01/02/2000' where Id=2;
+update clientes set fecha_nacimiento='05/31/2000' where Id=3;
+update clientes set fecha_nacimiento='11/01/1982' where Id=4;
+update clientes set fecha_nacimiento='12/08/1988' where Id=5;
+update clientes set fecha_nacimiento='12/16/1982' where Id=6;
+update clientes set fecha_nacimiento='12/03/1997' where Id=7;
+update clientes set fecha_nacimiento='12/12/1980' where Id=8;
+
+
+
+
+Procedimiento
+
+
+
+
+	CREATE OR ALTER PROCEDURE calculoEdad  @id int
+as
+DECLARE @fecha datetime
+select @fecha = fecha_nacimiento from clientes where id=@id
+DECLARE @actual as datetime
+set  @actual = getdate()
+DECLARE @añoActual as int
+set @añoActual = year(@actual)
+DECLARE @mesactual as int
+set @mesActual = month(@actual)
+DECLARE @diaActual as int
+SET @diaActual = day(@actual)
+DECLARE @año as int
+SET @año = year(@fecha)
+DECLARE @mes as int
+SET @mes = month(@fecha)
+DECLARE @dia as int
+SET @dia = day(@fecha)
+Declare @edad as int
+
+if (@mesactual > @mes)
+begin
+set @edad = @añoActual-@año
+update Clientes set edad=@edad where id =@id
+end
+else
+begin
+	if( @mesactual = @mes)
+	begin
+		if (@diaActual > @dia)
+		begin
+			set @edad = @añoActual-@año
+			update Clientes set edad=@edad where id =@id
+		end
+		else
+		begin
+			set @edad = @añoActual-(@año+1)
+			update Clientes set edad=@edad where id =@id
+		end
+	end
+	if (@mesactual < @mes)
+	begin
+		set @edad = @añoActual-(@año+1)
+		update Clientes set edad=@edad where id =@id
+	end
+end
+
+
+
+While para actuar procedure
+DECLARE @num as int
+set @num = 1 
+while @num <9
+begin
+exec calculoEdad @num
+set @num = @num +1
+end
+
