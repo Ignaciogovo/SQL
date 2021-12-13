@@ -212,3 +212,37 @@ exec calculoEdad @num
 set @num = @num +1
 end
 
+
+TRIGGER CALCULO EDAD
+CREATE OR ALTER TRIGGER añadirEdad 
+on clientes
+for update, insert
+as
+declare @var as int;
+select @var = id from inserted;
+exec calculoEdad @var;
+go
+
+
+
+
+5 Trigger historico de precio por kg de los ingredientes
+	creación tabla
+	create table historicoPrecioKg (
+	id int not null identity(1,1) PRIMARY KEY,
+	idIngrediente int null,
+	Nombre VARCHAR(100) null,
+	PrecioKg decimal(18,2) null,
+	fecha date null
+	)
+
+
+CREATE OR ALTER TRIGGER historicoPrecio
+ON ingredientes
+for update, insert
+as
+if UPDATE(preciokg)
+insert into historicoprecioKG select id,Nombre,Preciokg, GETDATE() from inserted
+go
+
+

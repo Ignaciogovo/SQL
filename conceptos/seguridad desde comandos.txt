@@ -12,12 +12,15 @@ Añadir Roles
 	GRANT SELECT on nombre_tabla to nombre_rol  ----> Permiso para hacer select a una tabla especifica.
 	
 		Para añadir un usuario a un rol existente.
-			ALTER ROLE nombre_rol ADD MENBER nombre_usuario;
+			ALTER ROLE nombre_rol ADD MEMBER nombre_usuario;
 Añadir y revocar permisos.
+
+grant insert on object::menu to jefe;
+grant delete on object::pedidos to jefe;
 	GRANT SELECT ON nombre_tabla to usuario;
 	GRANT CREATE TABLE
 	GRANT ALTER ON nombre_tabla
-	GRANT INSERT on nombre_tabla
+	GRANT INSERT on nombre_tabla      
 
 			Para poder quitar un permiso se usa REVOKE.
 				Ejemplo:  REVOKE SELECT ON nombre_tabla to usuario;
