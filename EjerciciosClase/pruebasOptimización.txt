@@ -1,0 +1,117 @@
+pruebas:
+Diferencias con el tamaño:
+
+
+create table salestinny(
+Region varchar(80),
+Country varchar(80),
+ItemType varchar(80),
+Sales_Channel varchar(80),
+Order_Priority char(1),
+Order_Date date,
+Order_ID int,
+Ship_Date date,
+UnitsSold int,
+UnitPrice decimal(18,2),
+UnitCost decimal(18,2),
+TotalRevenue decimal(18,2),
+TotalCost decimal(18,2),
+TotalProfit decimal(18,2)
+)
+
+
+
+
+create table salesbig(
+Region nvarchar(120),
+Country nvarchar(120),
+ItemType nvarchar(120),
+Sales_Channel nvarchar(120),
+Order_Priority nvarchar(1),
+Order_Date datetime,
+Order_ID int,
+Ship_Date datetime,
+UnitsSold int,
+UnitPrice decimal(18,2),
+UnitCost decimal(18,2),
+TotalRevenue decimal(18,2),
+TotalCost decimal(18,2),
+TotalProfit decimal(18,2)
+)
+
+
+Ejercicios:
+--Comparación
+exec sp_spaceused 'salesbig'
+exec sp_spaceused 'salestinny'
+exec sp_spaceused 'salesSinconfigurar'
+
+--Consultas en sqlquerystress   2 number of iterations, 7 number of threads
+select Region from salesbig --> 37.6686
+select Region from salestinny --> 30.3020
+select Region from salessinconfigurar -->58.9947
+
+--Plan de ejecución 
+tablescan
+select Region from salesbig --> 1.932s
+select Region from salestinny --> 1.560s
+select Region from salessinconfigurar --> 3.148s
+
+
+
+
+Diferencias con indices:
+
+create table salesSinconfigurar(
+
+Region varchar(100),
+Country varchar(100),
+ItemType varchar(100),
+Sales_Channel varchar(100),
+Order_Priority char,
+Order_Date datetime,
+Order_ID int,
+Ship_Date datetime,
+UnitsSold int,
+UnitPrice decimal(18,2),
+UnitCost decimal(18,2),
+TotalRevenue decimal(18,2),
+TotalCost decimal(18,2),
+TotalProfit decimal(18,2)
+)
+
+
+
+create table salesconf(
+Region varchar(100),
+Country varchar(100),
+ItemType varchar(100),
+Sales_Channel varchar(100),
+Order_Priority char,
+Order_Date datetime,
+Order_ID int,
+Ship_Date datetime,
+UnitsSold int,
+UnitPrice decimal(18,2),
+UnitCost decimal(18,2),
+TotalRevenue decimal(18,2),
+TotalCost decimal(18,2),
+TotalProfit decimal(18,2)
+)
+
+ Ejercicios plan de ejecución 
+--Sin función year
+ Creamos un indice
+	CREATE NONCLUSTERED INDEX INDX_DATE ON salesconf(ORDER_DATE)
+
+
+
+SELECT TOP 100 order_date
+FROM salesconf
+WHERE YEAR(order_date) = 2018 ---> Index Scan 0.493s
+SELECT TOP 100 order_date
+FROM salesconf WHERE Order_date< '01/01/2019' and Order_date> '01/01/2018' ---> Index seek 0.000s
+
+SQLQueryStress: --> 5 number of iterations, 20 number of threads
+Con función year: 50.5658
+sin función year: 00.2732

@@ -1,0 +1,61 @@
+	Sudo apt update
+	sudo apt upgrade
+-Descargar paquetes de requisitos previos que permitan a apt usar paquetes a través de https.
+	sudo apt install apt-transport-https ca-certificates curl software-properties-common
+-Añadir la clave de GPG para el repositorio oficial de Docker:
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+-Añadir el repositorio Docker a las fuentes de APT:
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+-Actualizar
+	Sudo apt update
+	sudo apt upgrade
+-Comprobar docker
+	apt-cache policy docker-ce
+-Instalar docker
+	sudo apt install docker-ce
+-Estado de Docker
+	sudo systemctl status docker
+
+
+*****Ejecutar el comando Docker sin sudo******
+
+-para dejar de escribir sudo siempre que quieras usar docker:
+	sudo usermod -aG docker ${USER}           ---->sudo usermod -aG docker username (para otro usuario)
+-Reinicia y escriba lo siguiente:
+	su - ${USER}
+-Comprueba que su usuario esta agregado en el grupo Docker.
+	id -nG
+
+
+*****Usar Docker******
+
+-para ver comandos de docker:
+	docker docker-subcommand --help
+-para saber info de docker:
+	docker info
+-descargar imagenes oficiales:
+	docker pull nombre_imagen
+-para ver las imagenes descargadas
+	docker images
+
+
+****Ejecutar contenedor Docker***
+-Ejecutar un contenedor y obtener acceso interactivo del shell del contenedor
+	docker run -it nombre_imagen
+
+-Para ver todos los contenedores
+	docker ps -a
+
+-Para iniciar un contenedor determinado
+	docker start nombreasignado --> ( viene en docker ps -a)
+-Para parar un contenedor en funcionamiento
+	docker stop nombreasignado --> ( viene en docker ps -a)
+-Para borrar un contenedor asignado
+	docker rm nombreasignado --> ( viene en docker ps -a)
+
+
+
+-Docker compose
+	descargar en ubuntu
+	docker-compose -d up
+
