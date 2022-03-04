@@ -20,8 +20,19 @@ CREATE TRIGGER testref BEFORE INSERT ON test1
 |
 
 DELIMITER ;
+Comprobar si el precio de un producto ha cambiado:
 
-
+DELIMITER $$
+CREATE TRIGGER 'actualizarPrecioProducto'
+BEFORE UPDATE ON 'productos'
+FOR EACH ROW
+BEGIN
+  IF NEW.coste <> OLD.coste
+    THEN
+      SET NEW.precio = NEW.coste * 2;
+  END IF ;
+END$$
+DELIMITER ;
 
 NEW AND OLD
 Nos permite acceder a columnas en los registros afectados por un disipador
@@ -33,4 +44,9 @@ Nos permite acceder a columnas en los registros afectados por un disipador
 
 
 Para poder usar ROLLBACK
- se puede modificar la tabla NEW con 
+ se puede modificar la tabla NEW si se usa el trigger tipo before:
+
+
+
+ Borrar trigger:
+ drop trigger nombre_trigger;
