@@ -7,6 +7,20 @@ id_trabajo INT,
 CONSTRAINT id_trabajo FOREIGN KEY (id_trabajo) REFERENCES trabajo(id)
 )
 
+****Auto incremento ****
+	Mysql
+id int NOT NULL AUTO_INCREMENT
+
+	SQL server
+id int IDENTITY(1,1) PRIMARY KEY
+
+	Oracle
+CREATE SEQUENCE id
+MINVALUE 1
+START WITH 1
+INCREMENT BY 1
+CACHE 10;
+
 
 **** Si tiene dos claves primarias******
 CREATE TABLE persona(
