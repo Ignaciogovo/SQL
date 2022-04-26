@@ -1,0 +1,34 @@
+CREATE OR ALTER TRIGGER nombre_trigger
+on table, all server, database
+FOR | INSTEAD OF   --> Escoger entre los dos For es para que se ejecute despues evento, Instead of es para ejecutar en lugar del evento.
+insert, update delete ---> La condición que sea
+AS 
+	Sentencia_sql
+
+
+
+Ejemplo
+CREATE TRIGGER HistoricoPrecio
+ON MENU
+For update, insert
+as
+begin set nocount on; --> "No deja rastro visible en la pantalla"
+IF update (PrecioVenta)
+begin
+INSERT INTO MENU_HCO
+SELECT id, nombre,precioVenta, getdate() 
+FROM INSERTED
+end
+end
+
+
+Tablas INSERTED y DELETED 
+Nos sirve para recuperar los datos modificados que han disparado el trigger.
+
+Habilitar, deshabilitar y eliminar un trigger
+Disable trigger nombre_trigger on table, all server, database
+enable
+
+
+
+ROLLBACK --> devuelve al estado anterior los datos.

@@ -1,0 +1,47 @@
+-- VISTA
+
+
+CREATE OR REPLACE VIEW nombre_vista
+as select nombre, id from datos;
+
+ALTER VIEW nombreviejo_vista RENAME TO nombrenuevo_vista;
+
+DROW VIEW [ IF EXISTS ] nombre_vista;
+
+
+
+UNION:
+
+
+	CREATE VIEW view_union
+	AS
+	SELECT nombre, id from datos;
+	union
+	select nombre, id from datos2;
+
+
+
+-- with check Option
+
+CREATE VIEW nombre_vista
+as select nombre, id from datos
+where options
+with check option;    ---> Si no se cumple las condiciones del where no se permite insertar en la vista.
+
+
+
+
+
+
+VISTAS MATERIALIZADAS ----> Almacenan el caché del resultado de una query.
+	-Aumenta el rendimiento de las consultas
+	-Método de optimización a nivel fisico
+	-EL PROBLEMA --> Hay que refrescar la vista.
+
+	CREATE MATERERIALIZED VIEW nombre_vista
+		as
+		query
+		with [no] DATA;
+	
+	REFRESH MATERIALIZED VIEW nombre_vista;
+	REFRESH MATERIALIZED VIEW CONCURRENTLY nombre_vista; --> Para esto hay que crear un indice 

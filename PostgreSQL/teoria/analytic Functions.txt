@@ -1,0 +1,44 @@
+
+
+
+Funciones Ventanas:
+	OVER:
+		OVER(partition by columna)
+		OVER(order by columna)
+		OVER( range columna) ----> 		RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING -- Conjuto entre el primero y el ultimo registro.
+							RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW -- conjunto entre el comienzo y el registro corriente.
+							RANGE BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING -- Conjunto entre el registro corriente y el final
+
+
+
+	Enumera ventanas
+		ROW_NUMBER()  OVER   --> 				ROW_NUMBER()  OVER ( [ PARTITION BY value_expression , ... [ n ] ] order_by_clause )
+		RANK()	      OVER   --> clasificacion de valor 	Ejemplo: RANK() OVER ( partition_by_clause  order_by_clause )
+		RANK_DENSE()  OVER   --> Clasificación de un valor en un grupo de valores   Ejemplo:    DENSE_RANK() OVER (PARTITION BY expr_list ORDER BY order_list)
+
+	
+
+
+	LAG(columna) over( ....)---> el registro anterior
+	lead(columna) OVER(...) --> El registro posterior
+
+	FIRST_VALUE(columna) --> El primer registro
+	LAST_VALUE(columna) --> El ultimo registro
+	nth_value(columna,posicion)
+
+
+
+
+
+	Ejemplo:::
+		--Consulta de estadisticas de salario de los trabajadores:
+			select employees.id, fname, lname, salary, 
+				round(avg(salary) over(order by salary RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING),2) as media_total, -- Media del salario entre todos los trabajadores
+				round(avg(salary) over (partition by departmentid),2) as media_departamento,	-- Media del salario de cada departamento
+				ag(employees.id) over(order by salary desc), -- incluir el trabajador por encima del registro con más salario
+			d.name
+			from employees inner join departments as d on departmentid=d.id;
+
+
+
+USAR FUNCIONES VENTANA EN UN WHERE

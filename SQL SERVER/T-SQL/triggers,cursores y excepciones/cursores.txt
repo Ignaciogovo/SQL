@@ -1,0 +1,43 @@
+Cursores:::::
+
+
+	--Declaracion:
+		DECLARE nombre_cursor CURSOR FOR CONSULTA
+						Ejemplo:     declare prodinfo cursor for select name from product
+
+	--Apertura:
+		OPEN nombre_cursor
+
+	--Recorrido del cursor y acceso a datos:
+		FETCH NEXT FROM nombre_cursor into @nombre_variable
+
+
+	-- ¿Como saber que el cursor ha terminado?
+		si @@fetch_status es = a 0 el cursor sigue funcionando.
+
+
+	--Cierre del cursor
+		CLOSE nombre_cursor
+
+	--Desalojo del cursor
+		DEALLOCATE nombre_cursor   --> Este paso eliminará la referencia al cursor definido previamente, por lo que ya no será posible realizar una reapertura del mismo
+
+
+
+Ejemplo de cursor:
+	--Declaramos variable que se le va a asignar a cada valor del cursor
+	DECLARE @Description AS nvarchar(400)
+	--Declaramos el cursor
+	DECLARE ProdInfo CURSOR FOR SELECT [Description] FROM Production.ProductDescription
+	--Abrimos el cursor
+	OPEN ProdInfo
+	-- Se recorre el cursor
+	FETCH NEXT FROM ProdInfo INTO @Description
+	-- El while para cuando acabe de recorrerse el cursor
+	WHILE @@fetch_status = 0
+	BEGIN
+    		select @Description
+    		FETCH NEXT FROM ProdInfo INTO @Description
+	END
+	CLOSE ProdInfo
+	DEALLOCATE ProdInfo

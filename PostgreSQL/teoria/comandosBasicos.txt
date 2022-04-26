@@ -1,0 +1,269 @@
+Crear una base de datos
+create database nombre_database
+
+
+Diferencias con sqlserver:
+	DATETIME --> timestamp
+
+	TOP --> select * from x limit 5
+
+	Autoincremento
+		---> id SERIAL 
+			Reiniciar con --> Truncate nombre_tabla restart identity
+
+
+Ejemplo de create table:
+	Create table test (
+	idtest SERIAL primary key,
+	nombre varchar(20),
+	telefono varchar(20) default 'Desconocido'
+	FOREIGN KEY (CustomerId) REFERENCES Customers(Id),
+
+
+***Unique***  
+	---No permite datos repetidos:
+		Alter table datos 
+		add constraint uq_nombre
+		Unique(salario)
+
+
+
+*** Eliminar una restriccion****
+	Alter table datos
+	drop constraint nombre_constraint
+Tipos de datos:
+-- Boolean = true or false
+--Character(n) = cadena de caracteres de tamaño fijo
+-- date = fecha 
+-- float 
+-- time 
+-- varchar(n) 
+
+
+
+
+
+
+-- Modificar tabla:
+Alter table datos
+ADD column test varchar(20);
+
+Rename Column Test to test2;
+
+Drop Column test;
+
+
+
+-- Modificar Columna:
+Alter table datos
+Alter column test set not null;    --> No permitir datos nulos
+Alter column test drop not null;    --> Permitir datos nulos
+Alter column test type integer	    --> Cambiar tipo de dato
+
+
+
+
+Consultas:
+	LIKE:
+		Select * from tabla
+		where nombre like '%i_'    -> consultas los nombres que tengan una i como penultima palabra
+
+
+
+
+	HAVING:
+		select nombre, salario from datos
+		where nombre like 'J%'
+		group by nombre, salario
+		having salario > 800   ---> Excluye todos los salarios menores de 800
+
+
+
+	Distinct:
+		select distinct nombre from plantilla --> Oculta valores repetidos
+
+
+	Between:
+		select * from plantilla
+		where salario between 800 and 1000  --> Entre estos valores
+		
+		select * from plantilla
+		where salario not between 800 and 1000 --> No entre estos valores
+
+
+	IN:
+		SELECT * FROM plantilla
+		where id  IN (2,3,11,5) ---> Sustituye a : "WHERE id = 2 OR id = 3 OR id = 11 OR id = 5"
+
+
+	LIMIT y OFFSET:
+		select * from plantilla limit 3 offset 4 ---> Muestras 3 registros a partir del cuarto
+
+
+
+
+
+
+	JOINS: INNER JOIN, FULL JOIN, RIGHT JOIN, LEFT JOIN.
+
+
+
+
+	Funciones matemáticas:
+		--abs(x) ---> optiene el valor absoluto de un número.
+		--sqrt(x) --> Raíz cuadrada
+		--cbrt(x) --> Raíz cúbica de un número.
+		--Power(x,y) --> x elevado a la y
+		--ceiling(x) --> Redondea hacia arriba.
+		--floor(x) --> redondea a la baja.
+		--Round(n,d) --> redondea a la d
+		--sign(x) --> Si es positivo devuelve 1, si es negativo devuelve -1 y si es 0 devuelve 0
+		--Mod(x,y) --> Resto de dividir x respecto a y
+		--Pi() --> Devuelve el número pi
+		--random() --> Devuelve un valor aleatorio entre 0 y 1
+		--trunc(x,d) --> Devuelve la parte entera de un número o puede ser como round()
+
+	Funciones para manejar caracteres:
+		--char_length(string) --> Devuelve el largo de la cadena de texto
+		--Upper(string) --> Devuelve los caracteres en mayuscula
+		--Lower(string) --> Devuelve en minuscula
+		--Position( string in string) --> ejemplo: position('hola' in 'hola mundo') --devuelve la posicion de un string en otro
+		--substring(string from int for int) --> Devuelve un conjunto de caracteres incluidos en el rango establecido
+		--trim(string) --> elimina los espacios de la izquierda y de la derecha
+		--trim(leading string from string) --> Ejemplo: trim(leading '-' from '--hello word--') elimina el - del principio
+		--trim(trailing string from string) --> Ejemplo: trim(trailing '-' from '--hello word--') elimina el - del final
+		--trim(both string from string) --> Ejemplo: trim(both '-' from '--hello word--') elimina el - de ambos lados
+		--ltrim (string,string2) elimina string2 de la izquerda
+		--rtrim (string,string2) elimina string2 de la derecha
+		--substr(string,int,int) --> Devuelve caracteres incluidos dentro de un rango
+		--lpad(string,int,string2) --> Agrega en la posicion int string2 a la izquierda
+		--rpad(string,int,string2) --> Agrega en la posicion int la cantidad de veces string2 a la derecha
+
+
+	Funciones para fecha y tiempo:
+		--current_date --> fecha de hoy
+		--current_time --> hora actual
+		--current_timestamp; --> Devuelve fecha y hora
+		--extract(year/month/day... from date-time-etc) --> funciones para extract: year, month, day, hour, minute, second, century, día de a semana = dow, día del año = doy, week, quarter
+
+
+	Operadores con registros nulos -- Null
+		select * from tabla
+		where columna is null / where columna is not null
+	
+
+	--Secuencias
+
+
+
+
+SubConsultas
+
+
+
+	select dato1, dato2, (select datos from tabla... where datos=dato2) from tabla
+		Ejemplo: los empleados con el nombre de su departamento: 
+			select fname, salary,departmentid, (select name from departments where id= departmentid ) 
+			from employees
+
+
+
+
+	select dato1, dato2 from tabla where condicion = (select ....)
+		Ejemplo: El departamento con la media de sueldo más alta:
+			select name 
+			from departments 
+			where id = (select departmentid from employees group by departmentid order by avg(salary) desc limit 1)
+
+	
+
+
+	Para más de un valor: CON EL "IN"
+		Ejemplo: Como el anterior pero no solo un departamento:
+			select name 
+			from departments 
+			where id in (select departmentid from employees group by departmentid order by avg(salary) desc)
+
+
+	
+
+
+	HACER UN UPDATE Y UN DELETE EN UNA SUBCONSULTA:
+		-UPDATE tabla set columna = (SELECT ....)
+			where condicion
+		-UPDATE tabla set columna = "Valor"
+			where condicion =/in (select .....)
+		
+		-DELETE from tabla where condicion =/in (select.....)
+
+
+
+
+	INSERT EN SUBCONSULTAS:
+		-INSERT into tabla select columna1,columna2 from tabla2 where...
+
+
+
+
+Como Crear variables:
+do $$
+	declare x int := dato
+	declare z varchar := dato
+	begin
+		Raise Notice 'la variable z es: %', z; ---> % es necesario
+	end
+$$;
+
+
+
+
+Condicional IF:
+do $$
+	begin
+		if exists (select/condicion)
+			respuesta
+		else
+			respuesta
+		end if;
+	end
+$$
+
+
+
+
+WHILE:
+do $$
+	begin
+		WHILE (varible < varriable2)
+		loop
+			respuesta;
+		end loop;
+	end
+$$
+
+
+
+Usar CASE:
+	Se puede usar en consultas:
+		select pais, precio,
+		    case when pais = "Turkey" then 'Vuelo retrasado'
+		         when pais = "Peru" then 'Vuelo con escalas'
+		         else 'Vuelo normal
+		     END as tipo_viaje
+		from vuelos     	
+
+
+
+
+
+
+
+
+
+
+
+INDICE:
+
+CREATE INDEX nombre_indice on tabla(columa)
+DROP INDEX nombre_indice
+

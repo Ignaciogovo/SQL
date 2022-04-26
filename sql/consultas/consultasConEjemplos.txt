@@ -1,0 +1,175 @@
+Consultas
+Mostrar elementos especificos de las tablas dependiendo del valor de otro elemento
+ 	select columna, columna
+ 	from tabla
+	where lower (columna)  = 'valor'
+
+
+
+Consultas:
+SELECT elementos, ...
+FROM nombre_tabla
+WHERE condicion;
+
+
+
+
+
+Especificaciones:
+-que tenga un valor el columna.
+ 	Por ejemplo
+		WHERE pais = 'españa';    Para que no afecte las mayusculas y minusculas
+				  	- WHERE lower(pais) = 'españa' minuscula
+					- WHERE upper(pais) = 'USA' mayuscula
+
+-Que el valor sea nulo
+ 	WHERE columna is null;
+	WHERE columna IS NOT NULL;	->Que no sea nulo
+					
+
+
+Devolver un subconjunto de registros de una tabla
+	WHERE columna = 'valor'
+	WHERE columnanumerica = numero
+	
+
+Operadores relacionales
+	< menor que
+	> mayor que
+	<> distinto de
+	<= menor o igual que
+	>= mayor o igual que
+	= igual que
+
+Para indicar un intervalo de valores numerales
+		BETWEEN	
+	WHERE 	columna BETWEEN valor AND valor
+
+
+
+Para comparar patrones de texto
+	comodines
+	% sustituye para cualquier caracter
+	_ sustituye para exactamente un caracter
+	[lista caracteres] cualquier caracter que este en la lista
+	[^lista caracter] cualquier caracter que no este en la lista
+
+
+WHERE columna LIKE 'Val%' ->devolveria todos los datos que empezaran por Val y siguieran con cualquier numero de caracteres
+
+
+
+
+
+Operadores logicos
+	AND - Y
+	OR - O
+	NOT- NO
+
+Ordenar por criterios
+	SELECT *
+	FROM ciudad
+	ORDER BY provincia ASC, numhabitantes DESC
+	|		
+	---->Devolveria todas las ciudades por provincia en orden ascendente y dentro de la provincia por orden descendente el numero de habitantes.
+
+
+
+Asignar alias
+	SELECT idCliente AS id, nombre AS cliente, descripcion AS desc
+	FROM clientes
+
+
+Consultas agrupadas (GROUP BY)
+		SELECT COUNT(*)
+		FROM TABLA 		->Numero total de registros
+
+
+		SELECT  columna, COUNT(*)
+		FROM tabla
+		GROUP BY columna 	->Se contara todos los registros con el mismo valor de la columna y calculara su cuenta
+
+
+
+		SELECT columna, SUM(columna)
+		FROM tabla
+		GROUP BY columna
+
+-Mostrar ciudad y codigo postal oficinas España
+	SELECT ciudad, codigopostal
+	FROM Oficinas
+	WHERE lower(pais)= 'españa';
+
+-Muestra el número de empleados que hay en la empresa
+	SELECT count(*) "Num empleados"
+	FROM Empleados;
+
+-Muestra las transacciones mayores que 100
+
+	SELECT Idtransaccion
+	FROM Pagos
+	WHERE cantidad >=100;
+
+-Muestra cuantos coches de cada marca hay.
+	SELECT Marca, count(*) as "Num Coches"
+	FROM coches
+	GROUP BY marca;
+
+Muestra el nombre del cliente y de sus representante de ventas si lo tiene.
+	SELECT Clientes.nombre as "Cliente", Empleados.nombre as "Representante"
+	FROM clientes, Empleados
+	WHERE clientes.codigoempleadorepventas=codigoempleado;
+
+
+Mostrar los nombres de los representantes que tengan más de 2 clientes.
+	SELECT empleados.nombre as "Representante"
+	FROM Empleados, clientes
+	WHERE clientes.codigoempleadorepventas=Empleados.codigoempleado
+	GROUP BY Empleados.codigoempleado
+	HAVING 2 < COUNT(*);
+
+Consultas date:
+day(date) --> Devuelve el dia en versión int
+MONTH(date) --> Devuelve el mes en versión int
+YEAR(date) --> Devuelve el año en versión int
+
+
+DISTINCT() --> Quita los valores repetidos.    -----------> Ejemplo SELECT DISTINCT nombre FROM personas
+SUM()--> Suma todos los valores de la columna.
+MIN() y MAX() --> Devuelven el valor minimo y maximo de la columna.
+AVG() --> Devuelve el valor promedio de la columna.
+***SCALAR****
+round()  --> Redondea a un numero de decimales especifico. ------------->Ejemplo SELECT ROUND(precio,0) AS rprecio FROM pedidos
+length() --> Devuelve la longitud de cada valor de la columna.
+UCASE() --> Devuelve los valores en mayuscula.
+LCASE()	--> Devuelve los valores en minuscula.
+
+
+INNER JOIN- Idéntico a la forma anterior de realizar consultas pero mas rapido							---
+LEFT JOIN: Si en una consulta, si un valor de la tabla de la izquierda no tiene correspondencia con la derecha se muestra NULL     | En vez de usar where se usa on
+RIGHT JOIN: Idéntico al anteriro pero con la derecha										   |
+FULL JOIN: Muestra todos los valores de ambas tablas según la correspondencia elegida, si no hay valor, se asociará un NULL	---
+
+	
+
+
+
+SUBCONSULTAS:
+	SELECT MAX(numeroClientes)
+	FROM ( SELECT Empleado.nombre, COUNT(*) numeroClientes
+		FROM Empleados INNER JOIN clientes
+		ON Clientes. codigoRepVentas=Empleados.codigo
+		GROUP BY Empleados.codigoempleado);
+
+
+
+Los pedidos realizados por clientes que son representados por un empleado concreto llamado pepito
+	SELECT Pedidos.codigopedido
+	FROM Pedidos
+	WHERE Pedidos.codigocliente IN (SELECT clientes.codigocliente
+	FROM Empleado INNER JOIN Clientes
+	ON Clientes.codigoRepVentas=Empleado.codigo
+	WHERE Empleado.nombre='Pepito')
+
+
+

@@ -1,0 +1,10 @@
+
+CUANTO SE GASTA EN CADA PAIS 
+
+select country.country, sum(p.amount) as total from ((((payment as p 
+join customer as cu
+on ((cu.customer_id=p.customer_id)))
+join address as a on ((cu.address_id=a.address_id)))
+join city as ci on (a.city_id=ci.city_id))
+join country on ((ci.country_id=country.country_id)))
+group by country order by total desc;

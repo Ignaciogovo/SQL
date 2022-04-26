@@ -1,0 +1,25 @@
+delimiter $$        --> Indica donde empieza el codigo
+
+    codigo
+
+delimiter ;         --> Indica donde termina el codigo
+
+
+
+
+Procedure:
+    create procedure monstrarVariable(variable1 int, variable2 int)
+    begin
+        codigo
+    end$$
+
+    call monstrarVariable();  
+
+Function
+    CREATE FUNCTION nombre_function( variable1 tipo_variable, variable2 tipo_variable)
+    RETURNS int
+    begin
+        RETURN variable;
+    end$$
+
+    select nombre_function(variable1,variable2)

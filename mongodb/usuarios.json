@@ -1,0 +1,22 @@
+[
+  {
+    "nombre": "Juan",
+    "apellidos": "Gonzalez",
+    "edad": 25,
+    "alta": true,
+    "dirección":
+    { 
+      "ciudad": "Barcelona"
+    }
+  },
+  {
+    "nombre": "Felipe",
+    "apellidos": "Sanchez",
+    "edad": 27,
+    "alta": false,
+    "dirección":
+    { 
+      "ciudad": "Madrid"
+    }
+  }
+]

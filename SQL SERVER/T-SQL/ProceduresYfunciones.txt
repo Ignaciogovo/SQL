@@ -1,0 +1,35 @@
+fucniones sobre varchars 
+	--> Replace
+	--> Left y right: Pasamos una cadena y un número, nos devolverá la cadena recortada a ese número de caracteres
+	--> Trim, Itrim Rtrim : Quita espacios en blanco.
+	--> Len: Nos da la longitud
+	--> Concat: Concatena dos cadenas.
+	--> Substring: Nos da una parte de un string indicandole posicion y número de caracteres.
+
+CAST: Para cambiar entero a cadena o viceversa.
+	Ejemplo 
+	Declare @num as int
+	SET @num = 5
+	DECLARE @cadena as varchar(10)
+	SET @cadena = cast(@num as varchar(10))
+
+
+Procedure:
+	Estructura.
+	CREATE PROCEDURE nombre @nombre_variable tipo_variable
+	AS
+		Parametros
+	GO;
+
+EXEC nombre_procedure variable   para Ejecutar.
+
+
+Function:
+	Estructura
+	CREATE FUNCTION dbo.nombre_function(@variable tipo_variable)
+	RETURNS Tipo_variable_a_devolver
+	AS
+	BEGIN
+	END
+
+Para ejecutar una function: --> Con un SELECT o print --> Ejemplo: select dbo.nombre_function()

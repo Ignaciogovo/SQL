@@ -1,0 +1,75 @@
+bcp [nombreBBDD.] propietario.{nombre_tabla| nombre_vista | "query"}
+    {in data_file | out data_file | queryout data_file | format nul}
+                                                                                                         
+    [-a packet_size]
+    [-b batch_size]
+    [-c]    --> Toma de forma predefina char como tipo de caracteres
+    [-C { ACP | OEM | RAW | code_page } ]
+    [-d database_name]
+    [-D]
+    [-e err_file]
+    [-E]
+    [-f format_file]
+    [-F first_row]
+    [-G Azure Active Directory Authentication]
+    [-h"hint [,...n]"]
+    [-i input_file]
+    [-k]
+    [-K application_intent]
+    [-l login_timeout]
+    [-L last_row]
+    [-m max_errors]
+    [-n]
+    [-N]
+    [-o output_file]
+    [-P password]
+    [-q]
+    [-r row_term]
+    [-R]
+    [-S [server_name[\instance_name]]
+    [-t field_term]
+    [-T]    ---> Usar la seguridad integrada de windows
+    [-U login_id]
+    [-v]
+    [-V (80 | 90 | 100 | 110 | 120 | 130 ) ]
+    [-w]
+    [-x]
+
+Ejemplo: 
+Importacion:
+BCP nombreBBDD.dbo.tabla in \Ruta\archivo -T -c -t
+Exportacion:
+BCP nombreBBDD.dbo.tabla out \Ruta\archivo -T -c -t
+
+
+Documentacion: https://docs.microsoft.com/es-es/sql/tools/BCP-utility?view=sql-server-ver15
+
+
+
+
+
+
+
+Para hacerlo desde el mssms:
+
+
+Preparar: 
+	-- To allow advanced options to be changed.  
+	EXECUTE sp_configure 'show advanced options', 1;  
+	GO  
+	-- To update the currently configured value for advanced options.  
+	RECONFIGURE;  
+	GO  
+	-- To enable the feature.  
+	EXECUTE sp_configure 'xp_cmdshell', 1;  
+	GO  
+	-- To update the currently configured value for this feature.  
+	RECONFIGURE;  
+	GO  
+
+
+
+-- Importacion:
+	EXEC master..xp_cmdshell 'BCP RALLY.dbo.piloto IN C:\Piloto.txt -T -c -t,'
+-- Exportacion:
+EXEC master..xp_cmdshell 'BCP RALLY.dbo.piloto OUT C:\Piloto.txt -T -c -t,'

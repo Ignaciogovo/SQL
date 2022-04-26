@@ -1,0 +1,22 @@
+CREATE TABLESPACE tablespace_name
+    [ OWNER { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER } ]
+    LOCATION 'directory'
+    [ WITH ( tablespace_option = value [, ... ] ) ]
+
+
+
+Ejemplo:
+	mkdir /data --> Creamos directorio
+	chown postgres:postgres /data ---> Hay que hacer dueño del directorio a postgres
+	CREATE TABLESPACE dbspace LOCATION '/data';
+
+
+
+Alter:
+	ALTER TABLESPACE nombre_tablespace RENAME TO nombre_nuevo;
+	ALTER TABLESPACE nombre_tablespace OWNER TO new_owner;
+
+
+DROP:
+
+	DROP TABLESPACE IF EXISTS nombre_tablespace;

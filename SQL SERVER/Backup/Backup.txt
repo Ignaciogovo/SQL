@@ -1,0 +1,24 @@
+USE nombre_bbdd;
+backup database nombre_bbdd
+to disk = 'd:\ruta\del\archivo\nombre_bbdd.bak'
+with format, --> Indica que es la primera copia de seguridad que se va hacer
+     medianame = 'CopiaNombre_bbdd'
+     name = ' Copia de facturas' --> Una especie de descripcion
+
+;
+
+
+	OPCIONES-
+
+
+
+
+
+
+
+Restauracion backup:
+
+USE master;
+
+restore database nombre_bbdd
+	from disk = 'd:\ruta\del\archivo\nombre_bbdd.bak'

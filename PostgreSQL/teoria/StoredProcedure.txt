@@ -1,0 +1,30 @@
+
+
+
+
+*************Funciones que returnan valores
+
+
+CREATE OR REPLACE FUNCTION suma (num1 int,num2 int) returns int
+as
+$$
+
+select num1+num2
+
+
+$$
+language SQL
+
+ --- Llamar una función:
+	select suma (50,250)
+
+
+
+
+CREATE OR REPLACE FUNCTION busquedaSalario (int) returns int
+as
+$$
+	select salary from employees where id = $1         -----> $1 es asignado cuando no se identifica con un nombre.
+	
+$$
+Language SQL

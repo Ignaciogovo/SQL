@@ -1,0 +1,111 @@
+
+
+HAY QUE CREAR UNA FUNCION ANTES DE HACER EL TRIGGER;
+
+DISABLE TRIGGER nombre_trigger | ALL
+DROP TRIGGER [ IF EXISTS ] nombre_trigger on nombre_tabla;
+
+CREATE OR REPLACE FUNCTION nombre_funcion () returns trigger
+as
+$$
+BEGIN
+	INSERT INTO historico values (old.dato, old.dato2);
+return new;
+END
+$$
+language plpgsql;
+
+
+
+CREATE OR REPLACE TRIGGER insertHistorico before update/insert/delete on nombre_tabla
+for each row
+execute procedure nombre_funcion;
+
+
+
+
+
+	Ejemplo:
+		CREATE FUNCTION insertHistoricocars() returns trigger 
+		as
+		$$
+		BEGIN
+			insert into historycars(carid,customerid,employeeid,status,totalcost) values (old.id,old.customerid,old.employeeid,old.status,old.totalcost);
+			return new;
+		END
+		$$
+		language plpgsql;
+
+
+		CREATE TRIGGER historicoCarsupdates before update on cars
+		for each row
+		execute procedure inserthistoricocars();
+
+
+
+
+
+
+-- Triggers After
+
+
+CREATE FUNCTION  controlTrigger()returns trigger
+as
+$$
+DECLARE
+Usuario varchar(250) := User; ----> Sacamos el usuario
+Fecha date := current_date; ----> Sacamos la fecha actual
+tiempo Time := current_Time;  --> Sacamos el tiempo exacto actual
+
+Begin
+insert into nombre_tabla values(new.nombre, new.did, new.salario, Usuario, Fecha, Tiempo)
+
+return new;
+END
+$$
+Language plpsql;
+
+
+
+
+
+
+
+Ejemplo:
+
+	CREATE OR REPLACE FUNCTION InserthistoricoEmployees() returns trigger
+	as
+	$$
+	declare
+	Usuario Varchar(100) := User;
+	fecha timestamp := current_timestamp;
+
+	Begin
+		insert into HistoryEmployees(idemployees,managerid,departmentid,salary,usuario,fecha) values (old.id, old.managerid,old.departmentid,old.salary, usuario, fecha);
+	return new;
+	END
+	$$
+	Language plpgsql;
+
+	CREATE TABLE historyEmployees (
+		id serial primary key,
+		idEmployees int NOT NULL,
+	        ManagerId INT,
+	        DepartmentId INT NOT NULL,
+		Salary INT NOT NULL,
+		usuario varchar(100) not null,
+		fecha timestamp not null,
+    		FOREIGN KEY (ManagerId) REFERENCES Employees(Id),
+    		FOREIGN KEY (DepartmentId) REFERENCES Departments(Id)
+	);
+
+
+
+
+
+	 CREATE OR REPLACE TRIGGER Historicotrabajadores after update on employees
+ 	 for each row
+	 execute procedure InserthistoricoEmployees();
+
+
+
