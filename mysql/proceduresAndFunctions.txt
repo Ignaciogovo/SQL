@@ -1,4 +1,4 @@
-delimiter $$        --> Indica donde empieza el codigo
+delimiter //       --> Indica donde empieza el codigo
 
     codigo
 
@@ -8,18 +8,166 @@ delimiter ;         --> Indica donde termina el codigo
 
 
 Procedure:
-    create procedure monstrarVariable(variable1 int, variable2 int)
-    begin
-        codigo
-    end$$
+	create procedure nombre_procedure(variable1 int, variable2 int)
+	begin
+        	codigo
+    	end //
 
-    call monstrarVariable();  
+	call nombre_procedure(variable1, variable2);  
+    	drop procedure nombre_procedure;
+
+
+
+	Otra forma ( parametros de salida y entrada)
+	CREATE PROCEDURE nombre_procedure(in variable1 int, out variable2 varchar(100))
+	begin
+        	codigo
+		select dato1
+		into variable2
+		from tabla1
+    	end //
+	call nombre_procedure(1,@variable2);
+	select @variable2;
 
 Function
-    CREATE FUNCTION nombre_function( variable1 tipo_variable, variable2 tipo_variable)
-    RETURNS int
-    begin
-        RETURN variable;
-    end$$
+    	CREATE FUNCTION nombre_function( variable1 tipo_variable, variable2 tipo_variable)
+    	RETURNS int
+    	begin
+        	RETURN variable;
+    	end //
 
-    select nombre_function(variable1,variable2)
+    	select nombre_function(variable1,variable2)
+
+
+
+	Mysql no permite returns table
+
+
+
+-Condicional if
+
+	if condicion then
+		codigo;
+	elseif condicion then
+		codigo;
+	else 
+		codigo;
+	end if;
+
+
+
+	Ejemplo:
+	if totalpedidos = 0 then
+		set frase = 'No hay pedidos'
+	elseif totalpedidos > 0 then
+		set frase = 'Hay pedidos'
+	end if;
+
+
+
+-Bucles while,loop,repeat
+
+
+	while
+		while condicion do
+			codigo;
+		end while;
+		
+		Ejemplo
+		while cont <= 5 do
+			set frase ='hola';
+			set cont=cont+1;
+		end while;
+
+	repeat
+		repeat
+			codigo;
+		until condicion
+		end repeat;
+
+		Ejemplo:
+		repeat
+			set frase ='hola';
+			set cont=cont+1;
+		until cont <= 5
+		end repeat;
+
+	loop
+
+		declare testloop varchar(10);
+		testloop :loop
+			codigo
+			if condicion then
+				LEAVE testloop;
+			end if;
+		end loop testloop;
+
+		Ejemplo
+			declare cont int default 0;
+			declare testloop varchar(10);
+			testloop :loop
+				select 'hola';
+				set cont=cont+1;
+				if  cont= 6 then
+					LEAVE testloop;
+				end if;
+			end loop testloop;
+
+
+
+
+
+
+
+SQL DINAMICO
+
+
+EJEMPLO DE PROCEDIMIENTO DINAMICO:
+	Consultar El valor medio o el valor total de un club especifico
+		DELIMITER //
+		CREATE PROCEDURE prueba(club int, modo int)
+		begin
+		if modo = 1 then 
+			set @consulta=concat('select avg(valor) from jugadores where id_club =',club);
+		elseif modo = 2 then
+			set @consulta=concat('select sum(valor) from jugadores where id_club =',club);
+		else 
+			set @consulta=concat("select 'No has cumplido con el orden'");
+		end if;
+		prepare select_invoices_statement from @consulta;
+		execute select_invoices_statement;
+		deallocate prepare select_invoices_statement;
+		end //
+		DELIMITER ;
+	
+
+
+
+
+
+
+Transacciones:
+
+DROP PROCEDURE transacciones;
+DELIMITER //
+CREATE PROCEDURE transacciones()
+BEGIN
+	DECLARE sql_error tinyint default false;
+	DECLARE CONTINUE HANDLER FOR sqlexeption
+	set sql_error = true;
+	
+	-- Iniciamos transaccion
+	start transaction;
+		codigo;
+	if sql_error= false then
+		commit;
+		select 'transacción fue ejecutada'
+	else
+		rollback;
+		select 'Transacción no fue ejecutada'
+	end if;
+end //
+DELIMITER ;
+
+
+

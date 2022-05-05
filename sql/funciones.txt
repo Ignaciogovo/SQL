@@ -34,13 +34,17 @@
 		--substr(string,int,int) --> Devuelve caracteres incluidos dentro de un rango
 		--lpad(string,int,string2) --> Agrega en la posicion int string2 a la izquierda
 		--rpad(string,int,string2) --> Agrega en la posicion int la cantidad de veces string2 a la derecha
-		concat(campo1,' ', dato1,campo2) --> Concatena distintos datos ofrecidos		
+		left(cadenaTexto,posicion) --> extrae los 10 primeros caracteres de una cadena
+		concat(campo1,' ', dato1,campo2) --> Concatena distintos datos ofrecidos
+		replace(campo1,'viejo','nuevo') --> Cambia la parte viejo del campo1 por nuevo
+		convert(campo1, tipo_variable) --> Acepta date,datetime,decimal,time,char,nchar,signed,unsigned y binary		
 
 	1.3 Funciones para fecha y tiempo:
 		--current_date --> fecha de hoy
 		--current_time --> hora actual
 		--current_timestamp; --> Devuelve fecha y hora
 		--extract(year/month/day... from date-time-etc) --> funciones para extract: year, month, day, hour, minute, second, century, día de a semana = dow, día del año = doy, week, quarter
+		DATE_FORMAT(fecha,formato_de_cadena) --> ejemplo: date_format(now(),'%d/%m/%y')
 		now() --> Fecha actual
 		sysdate() --> Fecha Actual
 		year() --> Extrae año de una fecha

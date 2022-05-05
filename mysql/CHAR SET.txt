@@ -1,0 +1,43 @@
+SHOW CHAR SET;
+latin1 --> 1 byte por carácter
+utf8mb3 --> 2 bytes por carácter
+utf8mb4 --> 4 bytes por carácter
+
+
+-- mostrar el character set default para un servidor
+show variables like 'character_set_server'
+
+-- mostrar el character set default para una base de datos
+show variables like 'character_set_database'
+
+
+
+
+collations
+-- Mostrar las collations disponibles en un servidor
+show collation where charset like 'utf8mb4%'
+
+-- Mostrar collation default server
+show variables like 'collation_server'
+
+-- Mostrar collation a cada tabla base de datos
+SELECT table_name, table_collation from information_schema.tables
+where table_schema ='nombre_base de datos'
+
+
+
+CREAR UNA BASE DE DATOS ESPECIFICAR CHAR SET y collation distintos
+	CREATE DATABASE IF NOT EXISTS nombreBBDD charset 'char set' collate ' collation';
+
+Modificar
+ 	ALTER DATABASE nombreBBDD charset 'char set';
+
+
+
+CREAR TABLA CON CHARSET DISTINTO:
+	create table tabla1(
+	id int,
+	nombre varchar(100)
+	)
+	charset utf8mb4 collate utf8mb4_0900_as_cs         ---> discrimina mayuscula y acentos    utf8mb4_0900_ai_ci --> No discrimina mayusculas y acentos  
+	ENGINE=InnoDB;

@@ -1,0 +1,73 @@
+Es importante mencionar que en MySQL
+los cursores solo podrán ser utilizados dentro de stored procedures.
+
+
+
+
+
+
+
+
+
+
+
+
+
+DECLARE variable1
+DECLARE row_not_found int default false;
+
+-- Declarar cursor
+DECLARE nombre_cursor CURSOR FOR 
+	select variable1
+	from tabla1
+
+-- Declarar manejador de errores para cuando el cursor no encuentre más renglones
+DECLARE continue HANDLER FOR NOT FOUND
+set row_not_found = true;
+
+-- Abrir cursor
+OPEN nombre_cursor;
+while row_not_found = false do
+	-- Obteniendo los valores del renglon y almacenandolo en variables
+	fetch nombre_cursor into variable1
+	select variable1
+end while
+
+
+-- Cerrar cursor;
+CLOSE nombre_cursor;
+
+
+
+
+Ejemplo:
+ Cuenta el numero de partidos en el que el equipo local ha marcado más de tres goles si el aforo es superior a 80
+drop procedure prueba;
+DELIMITER //
+create procedure prueba()
+begin
+	DECLARE variable1 int;
+	declare variable2 varchar(20);
+	declare afo int;
+	declare cont int default 0;
+	DECLARE row_not_found int default false;
+-- Declarar cursor
+	DECLARE recorrerPartidos CURSOR FOR
+	select goles_local, aforo from partidos;
+-- Declarar manejador de errores para cuando el cursor no encuentre más renglones
+	DECLARE continue HANDLER FOR NOT FOUND
+	set row_not_found = true;
+	OPEN recorrerPartidos;
+	while row_not_found = false do
+-- Obteniendo los valores del renglon y almacenandolo en variables
+		fetch recorrerPartidos into variable1, variable2;
+	    set afo = replace(variable2,'%','');
+	    if afo >= 80 and variable1 >= 3 then
+			set cont=cont+1;
+		end if;
+	end while;
+	close recorrerPartidos;
+	select cont;
+end //
+DELIMITER ;
+call prueba()

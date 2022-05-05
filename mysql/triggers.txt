@@ -1,15 +1,16 @@
 
 --> En estos triggers no se pueden llamar a procedures
-
+DELIMITER //
 CREATE TRIGGER 'nombre_trigger'
 BEFORE/AFTER UPDATE,INSERT,DELETE ON nombre_tabla
 FOR EACH ROW
-
-
+begin
+end //
+DELIMITER ;
 
 
 Ejemplo:
-DELIMITER |
+DELIMITER //
 
 CREATE TRIGGER testref BEFORE INSERT ON test1
   FOR EACH ROW BEGIN
@@ -17,7 +18,7 @@ CREATE TRIGGER testref BEFORE INSERT ON test1
     DELETE FROM test3 WHERE a3 = NEW.a1;  
     UPDATE test4 SET b4 = b4 + 1 WHERE a4 = NEW.a1;
   END
-|
+
 
 DELIMITER ;
 Comprobar si el precio de un producto ha cambiado:

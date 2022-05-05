@@ -126,7 +126,19 @@
 			REVOKE DROP USER FROM usuario@'%'; --> Retirar privilegio de borrar usuarios en cualquier IP
 
 		A continuacion para refrescar:
-		FLUSH PRIVILEGES;
+			FLUSH PRIVILEGES;
+	
+		Mostrar privilegios del usuario:
+			SHOW PRIVILEGES;
+
+		Mostrar todos los usuarios:
+			use mysql;
+			select user,host from user;
+
+		Renombrar un usuario:
+			rename user usuario@'direccionIP' to nuevo_nombre@'direccionIP';
+		Eliminar usuario:
+			DROP USER usuario@'direccionIP';
 
 	6.2 Oracle:
 			CREATE USER usuario IDENTIFIED BY contraseña;
