@@ -1,0 +1,347 @@
+1¿Que registra el registro de transacciones?
+2 Que son los archivos virtuales
+	2.1 Conocer cuantos archivos virtuales hay
+3 Leyendo Registro de transacciones SQL server
+	3.1 Transacciones de insert
+	3. 2 Consultas utiles
+	3.3 OBTENER EL VALOR INSERTADO E UPDATE
+	3.4 Obtener el nombre del usuario
+4 DBCC PAGE
+5 Convertir hex a binario
+6 CREAR BACKUP con el log
+7 Acceder a los datos del backup de log
+8 Crear una base de datos personalizando log
+9 Reducir o vaciar un archivo de registro
+10 Ver el tamaño del log de todas las base de datos
+
+
+
+
+
+1¿Que registra el registro de transacciones?
+	- Comienzo y finalización de la transacción
+	- Update, insert o delete
+	- Eliminación y creación de tablas e índices
+	- Grado y página de asignaciones y des asignaciones
+	- Truncado de tablas
+	- Todos los bloqueos
+
+
+
+2 Que son los archivos virtuales:
+	El registro de transacciones esta dividido internamente en varios archivos de registro virtuales. Conocidos por VLFs
+
+		Porque empeora el rendimiento?
+			
+
+
+
+	2.1 Conocer cuantos archivos virtuales hay:
+		Mientras menos cantidad de VLFs hay mejor rendimiento
+		DBCC LOGINFO
+			-Campos:
+				- RecoveryUnitID
+				- FileID: Este es el número de identificación del archivo físico del registro. Sólo aplica si usted tiene más de un archivo de registro físico.
+				- FileSize: Tamaño archivo bytes
+				- StartOffset: Este es el offset desde donde el VLF comienza en bytes. La salida es ordenada en esta columna.
+				- FseqNo: Orden en el que VLF será usado. El número más grande es el del uso actual. 0 No se esta utilizando
+				- Status: 0: Listo para reutilizarse, 2: No puede ser reutilizado
+				- Parity: Dos posibles valores: 64 y 128
+				- CreateLSN: Este es el LSN cuando el VLF fue creado. Si createLSN es 0, significa que fue creado cuando se creó el archivo físico del registro de transacciones.
+
+
+3 Leyendo Registro de transacciones SQL server
+	Funcion --> Permite ver entradas de los registros de las transacciones en línea. Acepta 2 parametros, LSN de inicio y de final.
+		SELECT * FROM fn_dblog(null,null)
+
+
+
+	3.1 Transacciones de insert:
+		SELECT
+  		[Transaction ID], [Current LSN], [Transaction Name], [Operation],  [Context],[AllocUnitName],[Begin Time],[End Time], [Transaction SID],
+  		[Num Elements] ,
+  		[RowLog Contents 0],
+  		[RowLog Contents 1],
+  		[RowLog Contents 2],
+  		[RowLog Contents 3]
+ 		FROM fn_dblog (NULL, NULL)
+ 		WHERE [Transaction ID] in (Select [Transaction ID] FROM fn_dblog (null,null) WHERE
+			[Transaction Name] = 'INSERT')
+		GO
+
+
+		-Operations:
+		LOP_BEGIN_XACT: --> Indica el inicio de cualquier transacción
+		LOP_COMMIT_XACT: --> Ultima entrada de una operacion
+		LOP_LOCK_XACT: --> Indica que una operación de bloqueo fue hecha. Para más información, columna lock information
+		
+
+	
+		- la columna Transaction name indica si ha sido un update, insert, create table etc
+
+	3. 2 Consultas utiles:
+			Ver las operaciones que tienen lugar:
+				SELECT [Current LSN],
+  			         [Operation],
+  				 [Transaction Name],
+  				 [Transaction ID],
+				 [Transaction SID],
+  				 [SPID],
+  				 [Begin Time]
+				FROM fn_dblog(null,null)
+				WHERE [Transaction Name] IS NOT NULL
+
+
+			Consulta para ver los principales tipos de consulta DML (INSERT, UPDATE, DELETE):
+				SELECT
+  				 [Current LSN],
+  				 [Transaction ID],
+  				 [Operation],
+     				 [Transaction Name],
+  				 [CONTEXT],
+  			 	 [AllocUnitName],
+  				 [Page ID],
+   				 [Slot ID],
+  				 [Begin Time],
+  				 [End Time],
+  				 [Number of Locks],
+  				 [Lock Information]
+				FROM sys.fn_dblog(NULL,NULL)
+				WHERE Operation IN
+				 ('LOP_INSERT_ROWS','LOP_MODIFY_ROW', 'LOP_DELETE_ROWS','LOP_BEGIN_XACT','LOP_COMMIT_XACT')
+			
+
+			Consulta para ver la frecuencia con la que ocurren los "Page Splits". 
+			Estos ocurren cuando los cambios de la fila no caben en la página de datos que tocaría y se mueven a una nueva 
+			(que tengan lugar son malos si hablamos en términos de rendimiento!):
+			
+
+				SELECT
+  				 [Current LSN],
+  				 [Transaction ID],
+  				 [Operation],
+  				 [Transaction Name],
+  				 [CONTEXT],
+  				 [AllocUnitName],
+  				 [Page ID],
+  				 [Slot ID],
+  				 [Begin Time],
+  				 [End Time],
+  				 [Number of Locks],
+  				 [Lock Information]
+				FROM sys.fn_dblog(NULL,NULL)
+				WHERE [Transaction Name]='SplitPage'
+				GO
+
+ 
+
+
+	3.3 OBTENER EL VALOR INSERTADO E UPDATE:
+		 copiamos el [Lock Information] --> HoBt 72057594043367424:ACQUIRE_LOCK_IX OBJECT: 7:725577623:0 ;ACQUIRE_LOCK_IX PAGE: 7:1:288 ;ACQUIRE_LOCK_X KEY: 7:72057594043367424 (0ce9c35da27c)
+			--> Cogemos los ultimos caracteres en parentesis() --> (0ce9c35da27c)
+			--> Lo incluimos en el where de este select:
+				select %%lockres%%, *
+				from [dbo].numero
+				where %%lockres%% = '(0ce9c35da27c)'
+
+	3.4 Obtener el nombre del usuario	
+			[Transaction SID] -->
+			Se puede saber el usuario en forma varchar: SUSER_SNAME([Transaction SID])
+					A la inversa: [Transaction SID] = SUSER_SID('Nombre_usuario');
+
+
+
+
+4 DBCC PAGE:
+	DBCC IND('NombreBaseDatos',Tabla,-1/-2)
+		PageFID PagePID     IAMFID IAMPID      ObjectID    IndexID     PartitionNumber PartitionID          iam_chain_type       PageType IndexLevel NextPageFID NextPagePID PrevPageFID PrevPagePID
+		------- ----------- ------ ----------- ----------- ----------- --------------- -------------------- -------------------- -------- ---------- ----------- ----------- ----------- -----------
+		1       34          NULL   NULL        725577623   1           1               72057594043367424    In-row data          10       NULL       0           0           0           0
+		1       288         1      34          725577623   1           1               72057594043367424    In-row data          1        0          0           0           0           0
+
+			PageFID  --> Un número de archivo donde residen las páginas
+			PagePID	 --> Un número de pagina dentro del archivo
+			IndexID  --> Si es 1 = es una página de datos, 2 = página de índice, 10 = página de IAM
+			IndexLevel-> Es el nivel dentro de la estructura de IAM en el que cae la pagina. Si es 0, entonces esta es una página de nivel de hoja para el índice.
+
+	dbcc traceon(3604,1);
+	dbcc page (NombreBaseDatos,1,288,1)
+
+		otra opcion: dbcc page (test,1,288,0) WITH TABLERESULTS
+		--> 288 pagina obtenida con el [Page ID] pasando de hexa a decimal 
+		--> La ultima condicion:
+			0 - imprimir sólo el encabezado de la página
+			1 - encabezado de página más volcados hexadecimales por fila y un volcado de la matriz de ranuras de página (a menos que sea una página que no tenga uno, como mapas de bits de asignación)
+			2 - encabezado de página más volcado hexadecimal de página completa
+			3 - encabezado de página más interpretación detallada por fila
+
+
+
+
+
+
+5 Convertir hex a binario:
+	DECLARE @LSN_HEX_SEP NVARCHAR(23) = '00000025:00000840:0001' ----> la columna: CURRENT LSN
+	DECLARE @N1 BIGINT = CONVERT(varbinary,substring(@LSN_HEX_SEP,1,8),2),
+		@N2 BIGINT = CONVERT(varbinary,substring(@LSN_HEX_SEP,10,8),2),
+		@N3 BIGINT = CONVERT(varbinary,substring(@LSN_HEX_SEP,19,4),2),
+
+	SELECT CAST(@N1 AS VARCHAR) + ':' +
+	       CAST(@N2 AS VARCHAR) + ':' +
+	       CAST(@N3 AS VARCHAR)
+
+
+
+
+
+
+
+6 CREAR BACKUP con el log:
+	Primero hay que hacer un back de la base de datos:
+		BACKUP DATABASE test TO DISK='C:\bb\test.bak' with FORMAT;
+	Segundo backup del log:	
+		backup log test to disk = 'c:\bb\arbitroslog.trn';
+
+
+
+7 Acceder a los datos del backup de log
+
+
+	SELECT
+	    [Current LSN],
+	    [Operation],
+	    [AllocUnitName],
+	    [Context],	
+	    [Transaction Name],
+	    SUSER_SNAME([Transaction SID]) AS loginName,
+            [Transaction ID],
+	    [Description]
+	FROM
+	    fn_dump_dblog (
+	        NULL, NULL, 'DISK', 1, 'c:\bb\test.trn',	
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT,
+	        DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT)
+	where [Operation] ='LOP_BEGIN_XACT';
+	GO
+
+
+8 Crear una base de datos personalizando log:
+	CREATE DATABASE test  
+	ON (NAME = test_dat, --logical datafile name
+	    FILENAME = 'D:\DATA\testdat.mdf',  --physical datafile name
+	    SIZE = 10,  MAXSIZE = 50,  FILEGROWTH = 5)  
+	LOG ON  (NAME = test_log, --logical logfile name
+	         FILENAME = 'L:\DATA\testlog.ldf',  --physical logfile name
+	         SIZE = 5MB,  MAXSIZE = 25MB,  FILEGROWTH = 5MB ) ;  
+	GO
+
+
+
+9 Reducir o vaciar un archivo de registro:
+	use test1;
+	go
+.  
+	Reducir -->DBCC SHRINKFILE (Test1__Log, 1);         -- truncated log file to 1 MB
+	vaciar --> DBCC SHRINKFILE (Test1_log, EMPTYFILE);  
+
+
+10 Ver el tamaño del log de todas las base de datos
+	DBCC SQLPERF(LOGSPACE)
+
+
+Resumen:
+	-Checkpoint es un proceso interno que escribe todas las páginas sucias (páginas modificadas)
+	 desde la caché de búfer hasta el disco físico.
+
+	-Un checkpoint también escribe los registros de registro desde el 
+	 búfer de registro en el archivo físico.
+
+	-El registro de transacciones es como un flujo serializado de conciencia 
+	 escrito en un archivo.
+
+	-Utilizamos la columna transaction ID en fn_dblog para ver todas las 
+	 operaciones de una transacción determinada.
+
+	-El inicio de cada transacción está marcado por una operación LOP_BEGIN_XACT.
+
+	-LOP_BEGIN_XACT es muy importante porque es el único registro que 
+	 contiene la fecha y hora de una transacción determinada.
+
+	-La función que utilizaremos a través del curso para navegar 
+	 por la transacción es fn_dblog.
+
+	-La columna Transaction Name a menudo nos proporcionará 
+	 información sobre la acción de la operación.
+
+	-Por ejemplo, la palabra INSERT en la columna indica que se ha 
+	 insertado una fila en una tabla.
+
+	-AllocHeapPageSimpleXactDML controla los aspectos internos de 
+	 la asignación de una página.
+
+	-HoBt significa Montón o árbol B.
+
+	-Un bloqueo exclusivo por intención significa que estamos dejando 
+	 que todos sepan que podríamos bloquear este objeto.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Preguntas:
+	Cuando se hace un backup full, se hace un truncate del log de transacciones, disminuye el archivo,entonces los registros virtuales se eliminan?
+	Que pasa cuando el log de transacciones llega al limite de espacio asignado
+	Porque no deja hacer un backup full cuando el registro de transacciones esta lleno?
+	- Backup de las tablas del sistema, como es el planteamiento de copias de seguridad, ( ¿scripts?)
+	- Imagen ( estrategia de backup differencial backup)
+
+
+
+
+Interpretar registros SQL server: https://programmerclick.com/article/6821269315/
+log de transacciones lleno: http://microsoftsqlsecret.fullblog.com.ar/log-de-transacciones-ldf.html
+Recuperar lo borrado con el log de transacciones: https://www.dataprix.com/es/blog-it/ilmasacratore/sql-server-saber-cuando-se-han-borrado-datos-y-recuperarlos-usando-registro
+VLFs --->
+	Que son los archivos de registro virtuales: https://echaleamssql.wordpress.com/2017/02/25/que-son-los-archivos-de-registro-virtuales-virtual-log-file-vlf/
+	Identificar cuantos VLF hay en un t-log file -->https://echaleamssql.wordpress.com/2017/02/26/como-identificar-cuantos-virtual-log-files-tiene-un-t-log-file/
+	Reglas de creacion de vlfs --> https://echaleamssql.wordpress.com/2017/02/26/reglas-en-la-creacion-de-vlfs/
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Anotaciones
+	-Si el log de transacciones llega al limite en cuestion de espacio
+	la base de datos se pone automaticamente en modo lectura

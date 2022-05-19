@@ -67,7 +67,9 @@
 2 modificar tablas
 	ALTER TABLE  nombre_table ADD nueva_columna datatype;
 				  DROP COLUMN column name;
-				  MODIFY nombre_columna datatype;
+				  MODIFY COLUMN nombre_columna datatype; 
+					--> SQL SERVER: alter column nombre_columna datatype;
+					--> MODIFY nombre_columna datatype;
 				  RENAME COLUMN column 1 to column 2;
 				  ADD CONSTRAINT nombre_constraint tipo_constraint;
 
@@ -75,6 +77,8 @@
 			ALTER TABLE Personas
 			ALTER COLUMN Ciudad DROP DEFAULT;
 
+
+	
 
 3 Insert
 	INSERT INTO table_name(columna1,columna2,columna3.....) VALUES (valor1,'valor2',valor3.....);
@@ -187,11 +191,11 @@
 		SHOW TABLE STATUS  --> información sobre cada tabla
 			SHOW TABLE STATUS FROM sakila LIKE 'payment'; -->from baseDatos like 'nombre_tabla'
 		SHOW PRIVILEGES --> Muestra los privilegios que admite el sistema
-		SHOW INDEX --> Muestra los indices
+		SHOW INDEXES FROM table_name; --> Muestra los indices
 		SHOW GRANTS FOR USER --> privilegios para un usuario
 		SHOW CREATE TABLE  table_name;
 		show columns from table_name; --> Muestra datos de las columnas
-
+		SHOW VARIABLES LIKE "%version%"; --> Muestra version servidor
 
 
 

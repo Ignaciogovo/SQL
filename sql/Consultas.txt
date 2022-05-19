@@ -27,11 +27,11 @@
 
 8 OVER
 
-
-
-
-
-
+9 Operadores(union,unionall...)
+	9.1 UNION
+	9.2 UNION ALL
+	9.3 EXEPT
+	9.4 INTERSECT  
 
 
 1 Condicones
@@ -307,6 +307,112 @@
 			from employees inner join departments as d on departmentid=d.id;
 
 
+
+
+
+
+
+9 Operadores(union,unionall...)
+	9.1 UNION --> combina el resultado de dos o mas columnas
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			UNION
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 1,2,3,4,5
+	9.2 UNION ALL --> combina el resultado de dos o mas columnas manteniendolo todo
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			UNION ALL
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 1,2,3,3,4,5
+
+		
+	9.3 EXEPT --> enumera las filas en el primero que no están en el segundo.
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			EXEPT
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 1,2
+
+
+	9.4 INTERSECT --> mantiene las filas que son comunes a todas las consultas.
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			INTERSECT
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 3
+
+
+
 9 Sacar la edad a partir de la fecha de nacimiento:
 	SELECT TIMESTAMPDIFF(YEAR,FechaNac,CURDATE()) AS edad
      	FROM clientes;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Operadores(union,unionall...): https://www.sqlshack.com/es/revision-ejemplos-y-uso-de-sql-union/

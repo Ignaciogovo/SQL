@@ -1,0 +1,49 @@
+# Configuramos resolución local de DNS En Maestros y esclavos
+nano /etc/hosts
+
+		127.0.0.1	localhost
+		127.0.1.1	postgreSQL01
+		192.168.0.2	postgreSQL01
+		192.168.0.3	postgreSQL02
+
+Maestro:
+
+		Creamos una copia del archivo	
+			cp /etc/postgresql/13/main/postgresql.conf /etc/postgresql/13/main/postgresql.conf.back
+		Editamos el archivo
+			nano /etc/postgresql/13/main/postgresql.conf
+		Buscamos listen_addresses descomentamos y lo modificamos
+			listen_addresses ='*'
+		Accedemos al usuario postgres
+			su postgres
+		Accedemos a la base de datos
+			psql
+
+		Creamos un usuario replciador en la base de datos
+			create user replica with replication encrypted password 'contraseña';
+		Incluimos en el archivo: /etc/postgresql/13/main/pg_hba.conf
+			nano /etc/postgresql/13/main/pg_hba.conf:
+				host      replication     replica      ipEsclavo        md5
+
+		Reiniciamos servicio:
+		systemctl stop/start postgresql
+
+Esclavo
+	Paramos servicio:
+		sudo systemctl stop postgresql
+	Hacemos una copia de seguridad de la carpeta:
+		su - 
+		cp -R /var/lib/postgresql/12/main/ /var/lib/postgresql/12/main_old/
+	Eliminamos la carpeta
+		rm -rf /var/lib/postgresql/12/main/
+	Usamos el comando basebackup
+		pg_basebackup -h 192.168.152.142 -D /var/lib/postgresql/12/main/ -U replica -P -v -R -X stream -C -S slaveslot1
+
+
+
+
+
+
+
+Comandos: https://www.postgresql.r2schools.com/how-to-setup-streaming-replication-in-postgresql-step-by-step-on-ubuntu/
+Video explicativo: https://www.youtube.com/watch?v=LhPAg583pKc&ab_channel=r2schools

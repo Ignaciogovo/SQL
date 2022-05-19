@@ -1,0 +1,13 @@
+sudo apt update
+
+
+
+-- Instalar
+sudo apt install postgresql postgresql-contrib
+
+-- Iniciar sesion con el usuario de postgres: El procedimiento de instalación creó un usuario llamada postgres asociada con el rol predeterminado de Postgres.
+
+sudo -i -u postgres
+
+En debian 
+	su postgres

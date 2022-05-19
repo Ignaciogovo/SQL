@@ -1,0 +1,90 @@
+-- 1 CREATE USER DEFINED FILEGROUP
+	USE testdb
+	go
+
+	-- Creamos el filegroup
+	ALTER DATABASE testdb
+	add filegroup testdbdata
+	go
+
+ -- metemos en el filegroup el archivo data
+	ALTER DATABASE testdb
+	add file
+	( name = N'testdbData',
+	  filename=N'C:\DATA\testdb_data.ndf',	
+	  size = 480,
+	  maxsize = 480,
+	  filegrowth = 10)
+	TO filegroup testdbdata
+	go
+
+-- 2 Validamos la creaciondel filegroup:
+	sp_helpfile
+
+--3 Movemos la tabla testTable a al grupo recientemente creado:
+
+	USE testdb
+	CREATE UNIQUE CLUSTERED INDEX [PK__testTabl__3213663BAA07BBAE]
+	on testTable(c1)
+	with (DROP_EXISTING = ON, ONLINE = ON)
+	ON testdbdata
+	go
+
+
+-- 4 Backup de la base de datos después de cualquier cambio importante en la base de datos
+
+	USE master
+	go
+	BACKUP DATABASE testdb
+	TO DISK = N'C:\bb\testdbfullbackup.bak'
+	with init, stats = 10
+	go
+
+-- 5 Simulamos una corrupcción en disco 
+
+-- Ejecute el proceso de checkpoint manualmente para ver el problema de corrupción del disco
+	USE testdb
+	go
+	checkpoint
+-- 7) establecer el archivo corrupto fuera de línea
+	ALTER DATABASE testdb
+		modify file ( name= N'testdbData', OFFLINE)
+	GO
+-- 8 Verificar el estado offline
+	use testdb
+	go
+	selet file_id,name,physical_name, state_desc
+	from sys.database_files
+	go
+
+-- 9 Backup del log de transacciones
+	USE master
+	go
+	backup log tesdb
+		to disk = N'C:\bb\tesdb_logbackup.trn'
+		WITH NOINIT, NO_TRUNCATE, STATS = 10
+	GO
+
+-- 10 Restauramos la fila dañada y lo movemos a otra localización
+	USE master
+	go
+	RESTORE DATABASE testdb
+		file= N'testdbData'
+		FROM DISK = N'C:\bb\testdbfullbackup.bak'
+		WITH FILE = 1,
+		MOVE = N'testdbData' TO N'C:ruta\deseada.ndf'
+		NORECOVERY
+	GO
+
+-- 11 RESTORE LOG testdb
+	from disk = N'C:\bb\tesdb_logbackup.trn'
+	with recovery, stats = 10
+	go
+
+-- 12 Verificar el estado online
+	use testdb
+	go
+	selet file_id,name,physical_name, state_desc
+	from sys.database_files
+	go
+

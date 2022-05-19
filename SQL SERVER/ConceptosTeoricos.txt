@@ -1,0 +1,144 @@
+1 Servicios
+2 Base de datos del sistema
+3 ARCHIVOS Y CONFIGURACIONES
+	3.1 Data Files
+	3.2 Log files
+	3.3 Datos para configuración
+	3.4 Filegroups
+	3.5 Mecanismos de Migración
+	3.6 Backup tipos
+4 Tipos de replicacion
+
+
+
+
+1 Servicios:
+	-Servicio MSSQLServer: se encarga de la administración de datos, procesamiento de transacciones y consultas. Integridad de los datos.
+
+	-Servicio SQLServerAgent: ejecuta tareas administrativas programadas, denominadas trabajos. Utiliza SQL Server para almacenar información de los trabajos. Los trabajos contienen uno o más pasos. Cada paso contiene su propia tarea; por ejemplo, realizar una copia de seguridad de una base de datos. El Agente SQL Server puede ejecutar un trabajo según una programación, como respuesta a un evento específico o a petición.
+
+	-Coordinador de transacciones distribuidas de Microsoft: se encarga de administrar las transacciones distribuidas.
+
+	-Microsoft Search: es un motor de indexación y de búsqueda de texto que permite al SQL Server realizar consultas de texto eficaces y sofisticadas sobre columnas que almacenan datos basados en caracteres. Incluye los catálogos de texto y los índices de texto.
+
+
+
+2 Base de datos del sistema:
+	-Master: Almacena información de configuración de la instancia de SQL Server, como puede ser la definición de los inicios de sesión,
+	 de las bases de datos, de los errores del sistema, permisos, etc. También contiene los procedimientos almacenados extendidos, 
+	 y muchos otros procedimientos almacenados del sistema sólo disponibles en Master.
+
+	-MSDB: tiene la función de dar soporte al Agente de SQL Server, de tal modo que almacena la definición y planificación de Trabajos, 
+	 Planes de Mantenimiento, etc. (incluyendo su historial de ejecución), así como almacena la definición de otros objetos como Operadores, 
+	 Alertas, etc. El Agente de SQL Server se conectará a esta base de datos, y por ello será necesario parar el Agente de SQL Server si 
+	 deseamos hacer un RESTORE de la misma, pues necesitaremos exclusividad. Sin embargo, MSDB también se utiliza cuando el Agente de SQL 
+	 Server no está presente, como es el caso de SQL Express (que no incluye éste servicio) o en los casos en que no se utiliza 
+	 (ej: el Agente de SQL Server está parado). Por poner ejemplos, siempre que se realiza una copia de seguridad o una restauración, se almacena en MSDB.
+
+	-Model: sirve de modelo ya que siempre que se crea una nueva base de datos se realiza una copia de la base de datos Model, heredando de ésta su 
+	 configuración y contenido, salvo que se especifique lo contrario.
+
+	-Tempdb: almacena tanto los objetos temporales (tablas temporales, procedimientos almacenados temporales, etc.),
+	 como los resultados intermedios que pueda necesitar crear el motor de base de datos, por ejemplo durante la ejecución de consultas 
+	 que utilizan las cláusulas GROUP BY, ORDER BY, DISTINCT, etc. Además, tempdb se crea de nuevo siempre que se inicia la instancia SQL Server,
+	 tomando su tamaño por defecto. Dado que según necesite más espacio, tempdb crecerá hasta el tamaño que necesite, y dado que el crecimiento 
+	 de un fichero implica esperas debidas a la entrada/salida, es muy importante en entornos críticos dimensionar correctamente TEMPDB para 
+	 que se cree con un tamaño apropiado, y evitar dichas esperas de entrada/salida en tiempo de ejecución, justo cuando estamos ofreciendo 
+	 servicio a los usuarios. Evidentemente, estamos desplazando dichas esperas al momento de inicio de la instancia, pero también conseguimos
+         una ventaja adicional al crear de una vez TEMPDB: limitamos la fragmentación (también muy mportante en entornos críticos).
+
+
+3 ARCHIVOS Y CONFIGURACIONES
+
+	3.1 Data Files: datos de la base de datos, está constituido por:
+	
+		Primary Data Files (.mdf)
+	
+		Secundary (.ndf)
+
+	3.2 Log files: datos y operaciones de las transacciones. Se constituye de un archivo .ldf
+
+	3.3 Datos para configuración:
+
+		-Nombre de archivo (filename)
+
+		-Tamaño inicial (size): importante para evitar futuras fragmentaciones.
+
+		-Tamaño máximo (maxsize)
+	
+		-Filegrowth (0 = not grow): incremento de crecimiento automático del archivo
+
+	3.4 Filegroups
+
+		Los filegroups (o grupos de archivos) son útiles para distribuir tablas con alto volumen de información en diferentes discos para separar los índices de los datos. Definen conjuntos de archivos para obtener paralelismo en distintas unidades almacenamiento. Sólo se pueden asignar filegroups a los data files.
+
+		Por defecto viene el Filegroup Primary que se asignan automáticamente las tablas del sistema y todas las tablas no asignadas a otro grupo.
+
+	3.5 Mecanismos de Migración
+
+		-Backup – Restore: es el más limpio y presenta el menor riesgo. Es sencillo ya que crea un único archivo con todo.
+
+		-Detach – Attach: se utiliza más que nada cuando queremos mover a otro disco físico. Es el método más rápido.
+
+		-Copy Database Wizard: asistente para crear una copia personalizada de una bd.
+
+		-Manual: copiamos los archivos de forma manual.
+
+	3.6 Backup tipos
+
+		-Full Backup: Resguarda base de datos y Log
+
+		-Modelo Full ( trunca el T-Log)
+
+		-Modelo Simple ( No hace backup del T-Log)
+
+		-Transaction Log: Copia transacciones completadas (Para Full y Bulk)
+
+		-Differencial: Parte de un Full Backup (más pesado que el de Log)
+
+
+
+4 Tipos de replicacion
+	Los tipos básicos de replicación
+	son:
+
+		replicación de instantáneas
+		replicación transaccional
+		replicación de mezcla
+
+
+	replicación de instantáneas:
+		- Se copian los datos tal y como aparecen en un momento determinado.
+		- No requiere contro continuo de los cambios
+		- Se suele replicar con menos frecuencia y puede llevar más tiempo a propagar las modificaciones
+		- Se recomienda utilizar cuando:
+			- Se replican pequeñas cantidades de datos
+			- Los sitios con frecuencia están desconectados y es aceptable un periodo de latencia largo
+			- Es necesario con datos como (text, ntext, images) cuyas modificaciones no se registran en los logs y por tanto no se pueden replicar con esos metodos
+
+
+	Replicación transaccional:
+		- Se propaga una instantánea inicial de datos y despues se van propagando las transacciones individuales a los suscriptores
+		- Es útil cuando:
+			- Se desea que los datos se propaguen normalmente pocos segundos después
+			- En escenarios en los que los suscriptores tratan los datos como sólo lectura.
+
+
+	Replicación Merge
+		- Permite que varios sitios funcionen en línea o desconectados de forma autónoma
+		- Mezcla las modificiaciones realizadas en un resultado único y uniforme.
+		- SQL SERVER hace un seguimiento de los cambios realizados. Los datos se sincronizan a una hora programada o por petición.
+		- Pueden producirse conflictos al mezclar las modificaciones de datos
+		- Cuando hay conflicto, El agente de mezcla invoca una resolución para determinar que datos acepta y se propaga.
+		- Es útil cuando:
+			- Varios suscriptores necesitan actualizar datos en diferentes ocasiones y propagar los cambios
+			- En ambientes en los que cada sitio hacen cambios solamente en sus datos pero necesitan tener la información de los otros sitios.
+
+
+
+
+
+
+
+Replicaciones: https://www.monografias.com/trabajos15/replicacion-datos/replicacion-datos
+Conceptos: https://www.monografias.com/trabajos81/conceptos-sql-server/conceptos-sql-server2

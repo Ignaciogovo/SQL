@@ -1,0 +1,6 @@
+Conocer cuanto espacio ocupa cada base de datos:
+
+	SELECT table_schema AS "BASE DE DATOS",
+	ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS "Tamaño (MB)"
+	FROM information_schema.TABLES
+	GROUP BY table_schema;

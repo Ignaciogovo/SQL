@@ -20,11 +20,7 @@ Mostrar usuarios:
 
 
 
-Crear superusuasrio:
 
-	ALTER USER mysuper WITH SUPERUSER;
-	# or even better
-	ALTER USER mysuper WITH SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN REPLICATION
 
 
 Consultar el tamaño de las tablas en una base de datos:

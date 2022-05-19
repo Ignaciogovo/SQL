@@ -1,0 +1,66 @@
+InoDB VS MyISAM
+	InoDB --> Más lento en insercciones, más seguro, comprueba claves foraneas
+	MyISAM --> Más rápido en insercciones, pero menos seguro, no valida nada 
+
+
+
+
+Dos tipos de replicaciones:
+
+
+
+STATE SNAPSHOT TRANSFER:
+	Hacen una copia de datos completa de un nodo a otro
+	dos enfoques diferentes en galera cluster para transferir un estado de una base de datos a otra:
+		logica: mysqldump ( Usado tambien para backup)
+		Physical: Este metodo copia los datos directamente de un servidor a otro
+
+
+INCREMENTAL STATE TRANSFER:
+	los nodos de aprovisionamiento del clúster determinan las transacciones que faltan en el adherente
+	y las envían únicamente, en lugar de todo el estado
+
+
+
+
+Limitaciones galera cluster:
+	-Actualmente la replicación sólo funciona con el motor de almacenamiento innodb.
+	-Cualquier escritura en tablas de otro tipo, incluidas las tablas del sistema, no se replica.
+	-Esta limitación excluye las sentencias del lenguaje de definición de datos como create user, que modifican implícitamente las tablas mysql.
+	-Sin embargo, existe un soporte experimental para myISAM (wsrep_replicate_myisam sytem variable)
+	-Todas las tablas deberian tener una primary key ( multi-column primary key son soportados)
+	-Las operaciones DELETE no son soportadas en una tabla sin primary key.
+	-Las filas en tablas sin primary key pueden aparecer en distinto orden en difentes nodos
+	-- Se puede hacer una tabla sin primary key pero podras tener problemas
+
+	Transaction size:
+		-Galera no limita el tamaño de las transacciones por lo que un conjunto de escritura se procesa como un único búfer residente en memoria y,
+			como resultado,las transacciones extremadamente grandes pueden afectar negativamente al rendimiento del nodo.
+		-Para evitarlo, las variables del sistema wsrep_max_ws_rows y wsrep_max_ws_size limitan las filas de la transacción a 128k y el tamaño de la transacción a 1gb por defecto.
+		-Si es necesario, el usuario puede querer aumentar esos límites.
+		-Las futuras versiones añadirán soporte para la fragmentación de transacciones
+
+
+Quorum:
+	El número actual de nodos en el cluster define el tamaño actual del cluster.
+	Cada vez que un nodo se une al clúster, el tamaño total del clúster aumenta.
+	Cuando un nodo abandona el clúster, el tamaño del clúster disminuye.
+	El tamaño del clúster determina el número de votos necesarios para alcanzar el quórum
+
+	El clúster Galera realiza una votación de quórum cuando un nodo no responde y se sospecha que ya no forma parte del clúster.
+	El componente que tiene quórum por sí solo sigue funcionando como componente primario,
+		mientras que los que no tienen quórum entran en el estado no primario y comienzan a intentar conectarse con el componente primario
+
+
+	Las agrupaciones que tienen un número par de nodos corren el riesgo de tener el cerebro dividido.
+	Si se pierde la conectividad de red entre las particiones de forma que el número de nodos se divida exactamente por la mitad, 
+		ninguna de las particiones puede conservar el quórum yambas entran en un estado no primario
+
+
+
+Seguridad:
+	Puedes proteger tu cluster galera usando tu firewall , o usando iptables o firewalld en linux, pero necesitas mantener los siguientes puertos abiertos:
+		3306: Para las conexiones de clientes de MySQL y la transferencia de instantáneas de estado que utilizan el método mysqldump
+		4567 Para el tráfico de replicación de Galera Cluster, la replicación multicast utiliza tanto el transporte UDP como el TCP en este puerto.
+		4568 Para la transferencia de estado incremental
+		4444 Para todas las demás transferencias de estados instantáneos
