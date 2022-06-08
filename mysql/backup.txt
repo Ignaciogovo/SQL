@@ -1,0 +1,67 @@
+Uso básico backup:
+
+	mysqldump [opciones] nombre_bd [nombre_tabla1 nombre_tabla2 ...] > ruta.sql
+
+Para ver las opciones
+	mysqldump --help 
+
+
+Ejemplos:
+
+	Respaldo de una base de datos:
+		mysqldump clientes > clientes.sql  
+
+	Respaldo de una base de datos con dos tablas
+		mysqldump clientes saldos facturas  > clientes.sql
+	
+	Respaldo de una base de datos pero ignorando dos tablas:
+		mysqldump clientes --ignore-table=clientes.temporal --ignore-table=clientes.basura > respaldo_clientes_2011.sql
+
+	Respaldo de todas las bases de datos:
+		mysqldump --all-databases > respaldo_full_sep_2011.sql
+
+	Respaldo de todas las base de datos incluyendo la contraseña y el usuario
+		mysqldump -u root -psecreto --all-databases --opt  > respaldo_full_sep_2011.sql
+
+	Respaldo dos base de datos, añadiendo un drop database(para asegurarnos que en la restauración se creé desde cero el respaldo, ignoramos errores:
+		mysqldump -u root -p --create-options --add-drop-database --force --databases clientes pedidos  > respaldo_ven_ped_2011.sql  
+
+	Respaldo completo de un servidor maestro en replicación indicando en el respaldo la posición para sincronización con servidores esclavos, además añadimos insertar completos que incluyen los nombres de columnas en sentencias INSERT
+		mysqldump -u root --password=secreto --all-databases --master-data  --complete-insert  > respaldo_2011.sql
+
+	Respaldamos solo el esquema de la base de datos sin registros:
+		mysqldump --no-data clientes > respaldo_esquema_clientes_2011.sql
+	
+	Se produce una salida compatible para restaurar la base de datos en Oracle
+		mysqldump --compatible=oracle --databases clientes > respaldo_clientes_oracle_2011.sql
+
+
+	Comprimir un respaldo:
+		mysqldump -u root -p --all-databases | gzip > respaldo_2011.sql.gz
+
+
+
+
+https://www.linuxtotal.com.mx/index.php?cont=info_admon_021
+	
+	Descomprimir:
+		gunzip respaldo_2011.sql.gz
+
+
+
+RESTAURACION:
+	Restauracion:
+		mysql -u root -p < respaldo.sql
+
+	Descomprimir en la misma frase
+		gunzip < respaldo.sql.gz | mysql -u root -p
+
+	Respaldo de una sola de base de datos y no contiene sentencias de drop database 
+
+	
+
+	
+
+	
+
+
