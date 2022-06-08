@@ -8,7 +8,7 @@
 	3.5 Mecanismos de Migración
 	3.6 Backup tipos
 4 Tipos de replicacion
-
+5 Trasvase de registros
 
 
 
@@ -136,7 +136,9 @@
 
 
 
-
+5 Trasvase de registros
+	 Permite enviar automáticamente copias de seguridad del registro de transacciones desde una base de datos principal de una instancia del servidor principal
+	 a una o varias bases de datos secundarias en instancias independientes del servidor secundario.
 
 
 
