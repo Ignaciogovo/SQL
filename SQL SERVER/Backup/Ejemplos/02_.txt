@@ -1,0 +1,136 @@
+--1 Create a backup to start with
+	Use master
+	go 
+	backup database testdb
+	 TO DISK = N'C:\bb\testdbBackup.bak'
+	 With name = N'Full database backup', DESCRIPTION = 'Starting pint for recovery',
+	 init,stats = 10
+	go
+--2 Check the number of records  in the table
+	USE testdb
+	select count(*) 
+	from testTable  ---> ( Lo apuntamos como referencia)
+	go
+--3 Simulate a disaster - accidentally dropping a table
+	SELECT getdate() --> (apuntamos la fecha)
+	go
+	waitfor delay '00:00:02' ---> Esperamos 2 segundos
+	drop table testTable
+	go
+-- 4 compruebe las propiedades de la base de datos. No hay demasiadas opciones debido a ser solo un solo archivo de datos
+	sp_helpfile
+	go
+-- 5 Contener el desastre restringiendo el acceso a la base de datos
+	USE MASTER
+	go
+	ALTER DATABASE testdb
+		set restricted_user
+		with rollback immediate
+	go
+
+
+-- 6) Backup del log de transacciones:
+	BACKUP LOG testdb
+	to disk= N'C:\bb\testdb_log.trn'
+	with INIT, STATS, NO_TRUNCATE
+
+-- 7 Check the contents del backup
+	RESTORE HEADERONLY
+	FROM DISK = N'C:\bb\testdbBackup.bak'
+	GO
+	RESTORE HEADERONLY
+	FROM disk= N'C:\bb\testdb_log.trn'
+	GO
+
+-- 8 Restauramos la base de datos:
+	USE MASTER
+	GO
+	RESTORE DATABASE testdb
+	from DISK = N'C:\bb\testdbBackup.bak'
+	with norecovery, restricted_user
+	go
+	-- restore log transacciones
+	RESTORE log testdb
+	FROM disk= N'C:\bb\testdb_log.trn'
+	WITH RESTRICTED_USER,
+	STOPAT = '2022-17-05 13:46:10.567',RECOVERY --> Escoger la fecha justo antes del desastre
+	GO
+
+-- 9 Comprobamos que se hayan conseguido todos los datos
+	USE testdb
+	select count(*) 
+	from testTable  ---> ( Lo apuntamos como referencia)
+	go
+
+
+
+
+
+
+-- 10 Hacemos un snapshot de la base de datos. Será un punto de referencia
+sp_helpfile
+go
+CREATE DATABASE testdb_RestorePointSnapshot
+on(
+	NAME = N'TESTDBDATA',
+	FILENAME = 'C:\DATA\testdb_RestorePointSnapshot.mdf_snap')
+AS SNAPSHOT OF testdb
+
+
+
+
+-------------------
+	use testdb
+	DBCC CHECKIDENT(TABLA) --> Indica el ultimo valor del indice
+
+-- 11 Creamos una brecha en el valor identity de la primary key.
+	
+	DBCC CHECKIDENT(TABLA,RESEED, Numero_indice)
+
+
+-- 12 Permitimos a los demas usuarios el uso de la tabla:
+	USE master
+	go
+	alter database testdb
+	 set multi_user
+	go
+
+
+--13  Creamos otra base de datos similar a la restaruarla para hacer comprobaciones.
+	RESTORE DATABASE testDB_Investigate
+	FROM DISK = N'C:\bb\testdbBackup.bak'
+	with
+		move N'tesdb_data' to N'C:\DATA\testDB_Investigate.mdf',
+		move N'testdb_log' to N'C:\DATA\testDB_Investigate.ldf',
+		STANDBY = N'C:\bb\testdbUndo.bak',
+		STOPAT ='MismoTiempoAnterior', STATS
+	GO
+
+
+	-- Restauramos el registro de transacciones:
+	RESTORE DATABASE testDB_Investigate
+	FROM DISK = N'C:\bb\testdb_log.trn'
+	with
+		STANDBY = N'C:\bb\testdbUndo.bak'
+		STOPAT ='MismoTiempoAnterior', STATS
+	GO
+
+
+-- 14 Comparamos entre las dos base de datos:
+	select max(c1) as restoredDB
+	from testDB_Investigate.dbo.testTable
+	go
+	
+	select max(c1) as ProductionDB
+	from testdb.dbo.testTable
+	go
+
+-- 15 Si los datos son diferentes:
+	2 opciones:
+		Primera:
+			insert into testdb.dbo.testTable 
+				select * 
+					from testDB_Investigate.dbo.testTable
+						where c1 > (La diferencia entre las dos comparaciones)
+		Segunda:
+			Uso de tablediff.exe

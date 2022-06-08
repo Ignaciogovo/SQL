@@ -1,0 +1,299 @@
+1 Servicio
+2 Comandos Basicos
+3 Coleccion basico
+4 Operaciones CRUD(create,read,update,delete)
+	4.1 CREATE
+	4.2 READ
+		4.2.1 Operadores busqueda
+		4.2.2 filtros
+		4.2.3 Cursor
+	4.3 UPDATE
+	4.5 DELETE
+5 Tipos de datos
+6 Creacion Variable
+7 Importar un archivo json
+8 Framework de agregacion
+
+1 Servicio
+	Parar servicio:
+	net stop mongodb
+
+	iniciar servicio
+	mongod --dbpath "C:\Program Files\MongoDB\Server\5.0\data"
+
+	Entrar:
+		mongo --> En el cmd
+
+
+
+
+
+2 Comandos basicos:
+	control+l == clear
+	show dbs -> mostrar base de datos
+	use nombre_bbdd --> Crea y usa una base de datos
+	db.dropDatabase()
+	show collections --> Muestra colecciones
+	db.stats()--> Estadisticas de una base de datos
+
+3 Coleccion basico
+	Crear una coleccion 
+		Ejemplo -->db.productos.insertOne({producto:"libro1",precio:9.99})
+
+		Insertar datos(Documento) dentro de otros:
+				db.productos.insertOne({producto:"libro1",precio:9.99, detalles:{tapa:"Dura",páginas:300}})
+		Insertar un propio id:
+				db.productos.insertOne({_id:123,producto:"libro1",precio:9.99})
+	
+	Borrar una coleccion
+		db.nombrecoleccion.drop()
+	Mostrar documentos de una coleccion:
+		db.productos.find()
+		db.productos.find().pretty() --> De forma más leible
+
+
+
+4 Operaciones CRUD(create,read,update,delete)
+
+
+	4.1 CREATE:
+		insertOne(data,options)
+		insertMany(data,options)
+
+
+
+		Insertarmuchos:--> insertMany([{documento1},{documento2},{documento3}])
+
+
+		Ordered
+			ordered:false --> permite insertar datos despues de un dato fallido
+			--> insertMany([{documento1},{documento2},{documento3}],{ordered:false})
+
+	4.2 READ:
+		find(filter, options) --> Devuelve un objeto cursor(Primeros 20)
+					--> Para que devuelva más: 
+						2 opciones: 
+							find().toArray()
+							find().forEach((elemento) => {printjson(elemento)})
+	
+		findOne(filter,options)
+
+	
+		Mostrar campos especificos:
+			find({},{campo1:1, id_:0})  --> Si no se especifica x campo no se incluye, menos el id
+
+		contar el numero de datos:
+			find().count()
+				
+
+		4.2.1 Operadores busqueda:
+				$gt > 
+				$gte >= 
+				$lt <
+				$lte <=
+				$eq ==
+				$ne !=
+				$in in    --> una lista
+				$nin not in
+					Ejemplo: db.usuarioDatos.find({edad:{$gt:23}})
+
+			Operadores matematicos
+				$subtract  --> Resta dos números o fechas, devolviendo la diferencia 
+					{ $subtract: [ <expression1>, <expression2> ] } 
+			Logicos
+				$and
+				$not
+				$nor
+				$or
+					Ejemplo: db.usuarioDatos.find({$and:[{edad:{$gt:23},{altura:180}]}})
+
+			OperadoresElementos:
+				$exists --> especifica si ese campo existe ---> $exists:false, true
+				$type --> especifica el tipo de dato ---> $exists:number,string....       ---> Todos los tipos en: https://www.mongodb.com/docs/manual/reference/operator/query/type/#mongodb-query-op.-type
+
+			OperadoresEvaluacion
+				$regex:               { <field>: { $regex: /pattern/, $options: '<options>' } } -- Te indica si la palabra pattern esta en la cadena
+
+				$expr:
+					Comparar dos campos de un solo documento:
+						db.ventas.find({$expr: {$gte:["$ventas", "$objetivo"]}}) --> Compara si las ventas han sido más altas que el objetivo
+					
+					Uso con instrucciones condicionales
+						Con el operador $cond:
+								   $cond: {
+      									if: { $gte: ["$qty", 100] },
+      									then: { $multiply: ["$price", NumberDecimal("0.50")] },
+      									else: { $multiply: ["$price", NumberDecimal("0.75")] }
+   									}
+
+			$size
+				db.collection.find({campo:{$size:4}}) --> Devuelve el documento que tenga una matriz con 4 datos
+	
+			$all
+				db.collection.find({campo:{$all:[matriz]}}) --> Devuelve todos los direcctorios que tienen los campos indicados de la matriz
+
+			$elemMatch
+				db.collecion.find({campo:{$elemMatch:{subcampomatriz1:condicion},{subcampomatriz1:condicion}}}      
+								-->hace coincidir los documentos que contienen un campo de matriz con al menos un elemento que coincide con todos los criterios de consulta especificados.
+								Se hace con matrices
+			
+			$slice
+				find({filtro1},{campo1Matriz:{$slice:1}}) --> solamente coge un campo de campo1Matriz
+								$slice:[1,2] --> Se salta uno, coge 2 campos
+
+		4.2.2 filtros:	
+			sort --> Ordenar resultados
+				db.collection.find().sort({"campo1":1,"campo2":-1,_id:0}) --> 1 ascendente, -1 descendente				
+
+			skip()
+				db.collection.find().skip(10) --> Salta los 10 primeros documentos
+		
+			limit()
+				db.collection.find().limit(2) --> limita a los dos primeros resultados
+
+			Filtros Texto:
+				/a/
+					db.collection.find(campo1:/a/) --> Contenga la palabra a
+				/a$/
+					db.collection.find(campo1:/a$/) --> Termina con la palabra a
+				/^a/ 
+					db.collection.find(campo1:/^a/) -->Comienza con la palabra a
+		4.2.3 Cursor:
+			Creamos una constante:
+				const objetoCursor = db.collection.find()
+			Ejecutar cursor:
+				objetoCursor.next()
+
+
+
+	4.3 UPDATE:
+		updateOne(filter,data,options)
+		updateMany(filter,data,options)
+		replaceOne(filter,data,options)
+	
+		Añadir otro campo a un documento especifico:
+			Ejemplo: db.productos.updateOne({producto:"libro1"},{$set:{estado:"Vendido"}})
+		Añadir otro campo a cualquier documento:
+			Ejemplo: db.productos.updateMany({},{$set:{estado:"Vendido"}})
+
+		Uso de $in para update
+			updateMany({campo1:{$in:["valor1","valor2"]}},{$set:{campo2:"valor3"}}) --> se modica los que el el campo 1 tenga valor1 o valor2
+
+		Incrementado valor $inc
+
+			updateOne({campo1:"valor1"},{$inc:{campo2:1}}) --> Con $inc incrementa 1 de valor al campo2
+		
+	
+		Actualizar valores con $min, $max, $mul
+			$min
+				updateOne({campo1:"valor1"},{$min:{campo2:20}}) --> cambia a valor 20 en el campo2
+			$max
+				updateOne({campo1:"valor1"},{$max:{campo2:40}}) --> cambia a valor 40 en el campo2
+		
+			$mul --> Multiplica
+				updateOne({campo1:"valor1"},{$mon:{campo2:1.1}}) --> incrementa el valor un 1.1 en el campo2
+		
+		Operador $unset --> Sirve para borrar un campo
+			updateOne({campo1:"Valor1"},{$unset:{campo2:""}})
+
+		Operador $rename --> Cambia nombre un campo
+			updateOne({campo1:"Valor1"},{$rename:{campoviejo:"camponuevo"}})
+
+		Operador upsert
+			Si existe, modificalo, si no existe, crealo
+				Ejemplo: db.productos.updateOne({producto:"libro1"},{$set:{estado:"Vendido"}},{upsert:true})
+
+		$push: Añade una etiqueta en una matriz sin machacar
+			db.productos.updateOne({producto:"libro1"},{$push:{estado:"Vendido"}})
+		
+		$pull: elimina partes del documento
+			db.productos.updateOne({producto:"libro1"},{$pull:{estado:"Vendido"}})
+				
+	4.4 DELETE:
+		deleteOne(filter,options)
+		deleteMany(filter,options)
+
+
+
+
+
+5 Tipos de datos
+	Saber el el tipo de dato que es un campo:
+		typeof db.collection.findOne().campo
+
+	Texto "Texto"
+	boolean true
+	Número:
+		numberint(int32) 23
+		numberlong (int64) 2020348023840823
+		numberDecimal  "100.65"
+	ObjectId  ObjectId("1234123")
+	fecha
+		ISODate   ISODate("2020-10-10")
+					---> insert({fecha: new Date()}) --> Indica la fecha actual
+		Timestamp Timestamp(1412180887,1)
+					--> ---> insert({fecha: new Timestamp()}) --> segundos desde la fecha 1 de enero de 1970
+	Documento incrustado {"documento": {...} }
+	Matriz  {"matriz":[...]}
+						-->	insert({nombre:"Nombre", aficiones:["aficion1","aficion2","aficion3"]})
+	
+							Acceder solamente a la matriz:
+							find({nombre:"Nombre"}).aficiones
+
+
+
+6 Creacion variable
+	var nombre_variable = valor
+				Ejemplo: var his = db.pacientes.findOne({nombre:"Juan"}).historial
+
+
+
+7 Importar un archivo json
+	desde el cmd(abierto en la carpeta donde se encuentre el archivo)
+		mongoimport --help
+		mongoimport --db=nombre_bbdd --collection=nombre_collection --file=archivo.json 
+					--jsonArray(Especifica que es una matriz el archivo) 
+					--drop(Elimina cualquier base de datos con ese nombre)
+
+
+
+
+8 Framework de agregacion
+	$match: --> Filtra documentos por algunos criterios
+		db.collection.aggregate([
+		{$match:{campo1:"valor1"}}
+		])
+
+	$group:	--> Realiza agrupación
+		db.collection.aggregate([
+		{$group:{_id:{nombre:"$campo2"}}}
+		])
+
+		Operadores de agregación
+			$sum
+					db.collection.aggregate([
+					{$group:{_id:{nombre:"$campo2"},nombre2:{$sum:1}}}
+					])
+			$sort
+					db.collection.aggregate([
+					{$group:{_id:{nombre1:"$campo2"},nombre2:{$sum:1}}},
+					{$sort:{nombre2:-1}}
+					])
+
+			$count:
+					db.personas.aggregate([ {$group:{_id:{nacionalidad:"$nat"},"trabajadores":{$count:{}}}},{$sort:{"trabajadores":-1}} ])
+
+			$avg
+					db.personas.aggregate([ {$group:{_id:{nacionalidad:"$nat"},"trabajadores":{$count:{}},"Media edad":{$avg:"$dob.age"}}},{$sort:{"trabajadores":-1}} ])
+
+
+	$project: --> Selecciona campos especificios
+		db.collection.aggregate([
+			{$project:{_id:0,campo1=1,campo2=1}}
+		])
+			Ejemplo:
+				db.personas.aggregate([
+				{$project:{_id:0, gender:1, NombreCompleto:{$concat:["$name.first"," ","$name.last"]}}}
+				])
+
+cheat-sheet: https://www.mongodb.com/developer/quickstart/cheat-sheet/

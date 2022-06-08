@@ -1,0 +1,184 @@
+Para que se puedan comunicar por nombre:
+	nano /etc/hosts
+
+		--> ip nombre_equipo Ejemplo: 10.0.2.2 mariadb1 
+
+
+apt -y install mariadb-server mariadb-client
+
+
+
+Configurar mariadb: mysql_secure_installation
+
+
+nano /ect/mysql/mariadb.conf.d/50-server.cnf
+
+	--> Comentamos la linea # bind-address             = 127.0.0.1 --> Para poder conectarnos de forma remota al server
+
+
+
+
+configuracion de galera:
+
+Da error
+	En el primer nodo:
+	Escribimos al final de /ect/mysql/mariadb.conf.d/50-server.cnf
+	[galera]
+	wsrep_on=ON
+	wsrep_provider=/usr/lib/galera/libgalera_smm.so
+	wsrep_cluster_address=gcomm://
+	binlog_format = row
+	default_storage_engine=InnoDB
+	inodb_autoinc_lock_mode=2
+	bind_address=0.0.0.0
+	wsrep_cluster_name="galera_cluster"
+	wsrep_node_address="nombre_maquina1"
+	
+	En el segundo nodo:
+	Escribimos al final de /ect/mysql/mariadb.conf.d/50-server.cnf
+	[galera]
+	wsrep_on=ON
+	wsrep_provider=/usr/lib/galera/libgalera_smm.so
+	wsrep_cluster_address="gcomm://nombre_maquina1, nombre_maquina2"
+	binlog_format = row
+	default_storage_engine=InnoDB
+	inodb_autoinc_lock_mode=2
+	bind_address=0.0.0.0
+	wsrep_cluster_name="galera_cluster"
+	wsrep_node_address="nombre_maquina2"
+
+
+
+
+
+En cada uno de los nodos:
+[galera]
+binlog_format=ROW
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+bind-address=0.0.0.0
+
+# Galera Provider Configuration
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+# Galera Cluster Configuration
+wsrep_cluster_name="db_cluster_beta"
+wsrep_cluster_address="gcomm://db00,db01,db02"
+
+# Galera Synchronization Configuration
+wsrep_sst_method=rsync
+# Can use mariabackup: apt install mariadb-backup
+# https://mariadb.com/kb/en/library/mariadb-backup-overview/#using-mariadb-backup-for-galera-ssts
+#wsrep_sst_method=mariabackup
+#wsrep_sst_auth=USER:PASSWORD
+
+
+# Galera Node Configuration
+wsrep_node_address="IP_DEL_NODO"
+wsrep_node_name="NOMBRE_DEL_NODO"
+
+
+
+
+Se detiene el servicio de MariaDB en todos los nodos ejecutando el siguiente comando en cada uno de ellos
+
+sudo systemctl stop mysql
+Se verifica que el servicio esté detenido
+
+sudo systemctl is-active mysql
+El comando debe mostrar "inactive"
+
+Ahora, en el nodo db00 se crea el nuevo cluster de Galera ejecutando el siguiente comando solamente en el nodo db00
+
+sudo galera_new_cluster
+
+
+
+
+
+
+Comprobacion
+
+	--> Desde el terminal de la base de datos: --> mysql -u root -p
+		SHOW STATUS LIKE 'wsrep_cluster_size'
+
+
+
+
+
+Reiniciar galera:
+
+
+Solución 1:
+1) Cambié el safe_to_bootstrap parámetro a 1en uno de los nodos del archivo /var/lib/mysql/grastate.dat:
+
+safe_to_bootstrap: 1
+2) Después de eso, maté todos los procesos de mysql:
+
+killall -KILL mysql mysqld_safe mysqld mysql-systemd
+3) Y comenzó un nuevo clúster:
+
+galera_new_cluster
+4) Todos los demás nodos que volví a conectar al nuevo:
+
+systemctl restart mariadb
+PS para instalar killall en CentOS use psmisc:
+
+sudo yum install psmisc
+
+
+
+
+Solución 2:
+Otra forma de reiniciar un MariaDB Galera Cluster es usar el--wsrep-new-clusterparámetro.
+
+1) Mata todos los procesos de mysql:
+
+killall -KILL mysql mysqld_safe mysqld mysql-systemd
+2) En el nodo más actualizado, inicie un nuevo clúster:
+
+/etc/init.d/mysql start --wsrep-new-cluster
+3) Ahora se pueden conectar otros nodos:
+
+service mysql start --wsrep_cluster_address="gcomm://192.168.0.101,192.168.0.102,192.168.0.103" \
+--wsrep_cluster_name="my_cluster"
+
+
+
+
+Variables de estado:		
+		SHOW GLOBAL STATUS LIKE 'wsrep_%';
+
+	-wsrep_cluster_state_uuid muestra el UUID de estado del clúster, que puede usar para determinar si el nodo forma parte del clúster.
+	-wsrep_cluster_conf_id muestra el número total de cambios de clúster que se han producido, que puede utilizar para determinar si el nodo forma parte o no del componente principal.
+	-wsrep_cluster_size muestra el número de nodos del clúster, que puede utilizar para determinar si falta alguno.
+	-wsrep_cluster_status muestra el estado principal del componente de clúster en el que se encuentra el nodo, que puede utilizar para determinar si el clúster está experimentando una partición.
+  
+  Comprobacion estado del nodo:
+	-wsrep_ready muestra si el nodo puede aceptar consultas.
+	-wsrep_connected muestra si el nodo tiene conectividad de red con cualquier otro nodo.
+	-wsrep_local_state_comment muestra el estado del nodo en un formato legible por humanos.
+
+ Comprobación estado replicación:
+	-wsrep_local_recv_queue_avg muestra el tamaño medio de la cola local recibida desde la última consulta de estado.
+	-wsrep_flow_control_paused muestra la fracción del tiempo, desde que se llamó por última vez, que el nodo se detuvo debido al control de flujo.FLUSH STATUS
+	-wsrep_cert_deps_distance muestra la distancia media entre los valores de número de secuencia más bajo y más alto, o seqno, que el nodo puede aplicar en paralelo.
+ 
+ 
+ Detección problemas de red lenta:
+	-wsrep_local_send_queue_avg muestran un promedio para la longitud de la cola de envío desde la última consulta.FLUSH STATUS
+
+
+
+
+
+
+
+configuracion debian= https://www.youtube.com/watch?v=3hqQdnEoulA&ab_channel=JoseMontilva
+Configuracion galera = http://apuntes.ucr.ac.cr/index.php?title=Crear_un_cluster_de_base_de_datos_MariaDB_con_Galera&mobileaction=toggle_view_mobile
+Explicacion wsrep_sst_method--> https://www.virtual-dba.com/blog/mariadb-galera-cluster-explained/
+Configuracion galera = https://www.digitalocean.com/community/tutorials/how-to-configure-a-galera-cluster-with-mariadb-10-1-on-ubuntu-16-04-servers
+Reiniciar galera= https://wikimho.com/es/q/dba/151941/%C2%BFc%C3%B3mo-reiniciar-el-cl%C3%BAster-mariadb-galera
+Informacion galera= https://programmerclick.com/article/44071549125/#%EF%BC%881%EF%BC%89%E6%9F%A5%E6%89%BE%E6%9C%80%E9%AB%98%E7%BA%A7%E7%9A%84%E8%8A%82%E7%82%B9
+Variables de estado= https://galeracluster.com/library/documentation/monitoring-cluster.html

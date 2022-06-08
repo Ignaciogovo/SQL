@@ -1,0 +1,26 @@
+pg_dump -U usuario_name -W -F t nombre_bbdd > /ruta/backup.tar
+
+
+-W obliga a pedir la contraseña
+-F especifica el formato:
+	t: tar
+	p: plain-text SQL script file (the default) .sql
+	c: custom
+
+Restaurar:
+Hay que crear una base de datos:
+CREATE database nombre_bbdd
+
+
+	Para un texto plano .sql:
+	psql -U usuario -d basededatos -h host -f archivoplano.sql
+
+	PARA  TAR FILE:
+	pg_restore -U usuario_name –d nombre_bbdd –v /ruta/backup.tar
+
+
+
+
+
+
+Generar backup: https://bitacoradeundba.com/backup-restore-postgresql/#:~:text=pg_dump%20es%20el%20comando%20usado,llamada%20%27bitacoradba%27%20con%20formato%20.

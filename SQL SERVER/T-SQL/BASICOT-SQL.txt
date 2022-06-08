@@ -1,0 +1,160 @@
+1 Declaracion variables
+2 Para saltar codigo
+3 into
+4 CASE
+5 IN/ANY/ALL
+6 TIPO DE dato TABLE
+7 Clausula output
+8 OFFSET ROWS FETCH NEXT ROWS ONLY
+9 GROUPING SETS
+10 ISNULL
+11 IF
+
+
+1 Declaracion variables:
+
+
+	declare @variable tipo_dato
+	set @variable= dato
+	declare @variable2 tipo_dato = dato
+
+	Otra forma:
+		declare @variable1 tipo_dato = dato1,
+		        @variable2 tipo_dato = dato2,
+			@variable3 tipo_dato = dato3
+
+
+
+2 Para saltar codigo
+	goto nombre_etiqueta
+
+		codigo
+
+		codigo
+
+	nombre_etiqueta:
+
+3 into:	 ---> Crea una tabla y a partir de los resultados de una select
+	select * 
+	into nombre_tabla_nueva
+	from nombre_tabla
+	where condicion
+
+
+
+
+4 CASE: Ejemplo:
+		select nombre,
+			case when direccion like '%calle%' then 'calle'
+			     when direccion like '%avenida%' then 'Avenida'
+			     else 'otra'
+			end as Tipo_direccion
+		from cliente
+
+
+
+
+5 IN/ANY/ALL Cuando hay más de un valor en la subconsulta:
+
+
+  in
+	SELECT * 
+	FROM TABLA 
+	WHERE CONDICION IN (select ....) ---> Si es uno de esos valores de la subconsulta
+  any	
+	SELECT * 
+	FROM TABLA 
+	WHERE CONDICION > any (select ....) ---> Si mayor que uno de esos valores de la subconsulta
+	
+  all	
+	SELECT * 
+	FROM TABLA 
+	WHERE CONDICION > all (select ....) ---> Si mayor que todos esos valores de la subconsulta
+
+
+
+
+
+6 TIPO DE dato TABLE:
+	DECLARE @nombre_variable table(
+		columna tipo_dato,
+		columna2 tipo_dato,
+		etc...
+	)						Ejemplo:
+
+	
+							delcare @miTabla table(
+								dni varchar(10) not null,
+								nombre varchar(40) not null,
+								email varchar(35)  null,
+								edad tinyint null,
+								direccion varchar(40) null
+							)
+
+
+
+7 Clausula output: --> Podemos usar inserted y deleted sin necesidad de triggers
+
+	Ejemplo:
+		insert into tabla
+			output inserted.*
+		values(dato1,dato2,...)
+
+
+		Con el tipo de variable dato:
+		insert into tabla
+			output inserted.*
+			into @mitabla
+		values(dato1,dato2,...)
+
+	select * from @miTabla     -----> Permite guardar los datos del inserted para usarlo en otro momento.
+
+	Ejemplo update:
+		UPDATE tablaPruebas
+		SET nombre = 'LUIS' , fecha = '20101212'
+			OUTPUT inserted.*, deleted.*
+		WHERE cve = 2
+
+
+
+8 OFFSET ROWS FETCH NEXT ROWS ONLY
+--Es necesario el uso de order by
+	OFFSET 2 ROWS  --Indica la posicion del registro Inicial...(el resultado de ..(1))
+	FETCH NEXT 2 ROWS ONLY; --Indica la posicion del resultado registro Final que quieres tomar..(el resultado de..(2)).
+
+
+
+9  GROUPING sets ():
+
+--Permite hacer agrupaciones distintas en una misma consulta.
+
+Ejemplo: 
+
+	SELECT SUM(value) AS Total, Zone, Country 
+	FROM dbo.Client
+	GROUP BY
+	GROUPING SETS
+	((Zone, Country),(Country),()) -----> 1Union: grupo zone y country, 2Union: Country,3Union: todo
+	ORDER BY GROUPING(Zone), GROUPING(Country)
+
+
+10 ISNULL():
+
+
+	Si un dato es null lo cambias por lo deseado
+	Ejemplo:
+		ISNULL(NombreTabla, deseado)
+		ISNULL(correoElectronico, 'Sin correo electronico')
+
+11 IF
+
+		-IF ELSE END
+		IF condicion
+		BEGIN
+			opciones
+		 END
+		ELSE
+		 BEGIN
+			opciones
+		 END
+		END

@@ -1,0 +1,68 @@
+-- Tablas particionadas:
+	- Ayuda el mantenimiento de tablas grandes y a disminuir el tiempo de respuesta general para leer y cargar datos.
+	- Divide en multiples partes más pequeñas.
+
+
+
+Usamos el comando para obtener los filegroups ya que tendremos que crear uno nuevo:
+	sp_helpdd nombre_baseDatos --> Obtenemos los filegroups
+
+
+
+Creamos 2 filegroups:
+	ALTER DATABASE nombre_basedatos
+		ADD FILEGROUP nombre_filegroup1
+	
+
+	ALTER DATABASE nombre_basedatos
+		ADD FILEGROUP nombre_filegroup2
+	
+
+Creamos un archivo para cada filegroup:
+	ALTER DATABASE nombre_baseDatos
+		ADD FILE
+			(
+				NAME= nombre_filegroup1,
+				FILENAME = 'C:\RUTA\DESEADA.ndf',
+				size = 10 MB,
+				MAXSIZE = UNLIMITED,
+				FILEGOWTH = 64 MB
+			) TO FILEGROUP nombre_filegroup1
+
+
+
+	ALTER DATABASE nombre_baseDatos
+		ADD FILE
+			(
+				NAME= nombre_filegroup1,
+				FILENAME = 'C:\RUTA\DESEADA.ndf',
+				size = 10 MB,
+				MAXSIZE = UNLIMITED,
+				FILEGOWTH = 64 MB
+			) TO FILEGROUP nombre_filegroup1
+
+
+
+--- Crear funcion
+	CREATE PARTITION FUNCTION nombre_funcion (tipo_dato)
+	AS RANGE LEFT FOR VALUES(dato_inicial, dato final)
+
+-- Crear Esquema:
+	CREATE PARTITION SCHEME particionamiento
+	AS PARTITION nombre_funcion
+	TO (PRIMARY,nombre_filegroup1,nombre_filegroup2)
+go
+
+
+-- Forma de particionar la tabla:
+
+CREATE TABLE tabla(
+c1 tipo_dato primary key,
+c2 tipo_dato
+) ON particionamiento(c1)
+
+
+
+
+
+- Video: https://youtu.be/vWSOq5w7FWA

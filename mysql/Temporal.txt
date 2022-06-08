@@ -1,0 +1,18 @@
+
+
+
+CREATE TEMPORARY TABLE nombre_tabla select * from tabla1;
+
+Campos calculados:
+	CREATE TABLE ejemplo(
+	id int(11) not null auto_increment,
+	cantidad double not null,
+	precio double not null,
+Genereado: total double AS (cantidad * precio) NOT NULL,
+Genereado: descuento float as generated always as (cantidad*precio)/10 VIRTUAL
+	)
+
+	Opciones:
+  default-->	Virtual:  Los valores de columna no se almacenan, evalúan cuando se leen las filas. Una columna virtual no requiere almacenamiento.
+		Stored: Los valores de columna se evalúan y almacenan cuando se insertan o actualizan filas. Una columna almacenada requiere espacio de almacenamiento y se puede indexar.
+		

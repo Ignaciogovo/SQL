@@ -1,0 +1,57 @@
+1 Funciones predefinidas
+	1.1 Funciones matemáticas
+	1.2 Funciones para manejar caracteres
+	1.3 Funciones para fecha y tiempo
+
+
+1 Funciones predefinidas
+	1.1 Funciones matemáticas:
+		--abs(x) ---> optiene el valor absoluto de un número.
+		--sqrt(x) --> Raíz cuadrada
+		--cbrt(x) --> Raíz cúbica de un número.
+		--Power(x,y) --> x elevado a la y
+		--ceiling(x) --> Redondea hacia arriba.
+		--floor(x) --> redondea a la baja.
+		--Round(n,d) --> redondea a la d
+		--sign(x) --> Si es positivo devuelve 1, si es negativo devuelve -1 y si es 0 devuelve 0
+		--Mod(x,y) --> Resto de dividir x respecto a y
+		--Pi() --> Devuelve el número pi
+		--rand() --> Devuelve un valor aleatorio entre 0 y 1
+		--trunc(x,d) --> Devuelve la parte entera de un número o puede ser como round()
+
+	1.2 Funciones para manejar caracteres:
+		--char_length(string) --> Devuelve el largo de la cadena de texto
+		--Upper(string) --> Devuelve los caracteres en mayuscula
+		--Lower(string) --> Devuelve en minuscula
+		--Position( string in string) --> ejemplo: position('hola' in 'hola mundo') --devuelve la posicion de un string en otro
+		--substring(string from int for int) --> Devuelve un conjunto de caracteres incluidos en el rango establecido
+		--trim(string) --> elimina los espacios de la izquierda y de la derecha
+		--trim(leading string from string) --> Ejemplo: trim(leading '-' from '--hello word--') elimina el - del principio
+		--trim(trailing string from string) --> Ejemplo: trim(trailing '-' from '--hello word--') elimina el - del final
+		--trim(both string from string) --> Ejemplo: trim(both '-' from '--hello word--') elimina el - de ambos lados
+		--ltrim (string,string2) elimina string2 de la izquerda
+		--rtrim (string,string2) elimina string2 de la derecha
+		--substr(string,int,int) --> Devuelve caracteres incluidos dentro de un rango
+		--lpad(string,int,string2) --> Agrega en la posicion int string2 a la izquierda
+		--rpad(string,int,string2) --> Agrega en la posicion int la cantidad de veces string2 a la derecha
+		left(cadenaTexto,posicion) --> extrae los 10 primeros caracteres de una cadena
+		concat(campo1,' ', dato1,campo2) --> Concatena distintos datos ofrecidos
+		replace(campo1,'viejo','nuevo') --> Cambia la parte viejo del campo1 por nuevo
+		convert(campo1, tipo_variable) --> Acepta date,datetime,decimal,time,char,nchar,signed,unsigned y binary		
+
+	1.3 Funciones para fecha y tiempo:
+		--current_date --> fecha de hoy
+		--current_time --> hora actual
+		--current_timestamp; --> Devuelve fecha y hora
+		--extract(year/month/day... from date-time-etc) --> funciones para extract: year, month, day, hour, minute, second, century, día de a semana = dow, día del año = doy, week, quarter
+		DATE_FORMAT(fecha,formato_de_cadena) --> ejemplo: date_format(now(),'%d/%m/%y')
+		now() --> Fecha actual
+		sysdate() --> Fecha Actual
+		year() --> Extrae año de una fecha
+		month() --> Extrae mes de una fecha
+		day() --> Extrae dia de una fecha
+
+
+
+
+Funciones: https://conclase.net/mysql/curso/cap11

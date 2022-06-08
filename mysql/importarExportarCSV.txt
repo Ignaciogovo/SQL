@@ -1,0 +1,37 @@
+
+Importar con select * from into...
+
+	select * from table1
+	into outfile
+	'c:\\direccion\archivo'
+	FIELDS TERMINATED BY ','
+	ENCLOSED BY '"'
+	LINES TERMINATED BY '\r\n';
+
+
+Exportar con select * from into...
+	SELECT * INTO OUTFILE '/path/to/result.txt'
+	FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+	LINES TERMINATED BY '\n'
+	FROM marcas;
+
+
+Importar con mysqldump
+	mysqldump -u usuario -p nombrebasededatos < /ruta/direccion/archivo.sql
+
+Exportar con mysqldump
+	mysqldump -u basedatos -p nombrebasededatos > archivo.sql
+
+Importar fichero SQL:
+	mysql -u basedatos -p nombrebasededatos < archivo.sql
+
+
+Desde la linea de comandos de la base de datos:
+	use nombreBasedatos;
+	source /directorio/archivo.sql
+
+
+Exportar, importar una sola tabla desde linea de comandos:
+	mysqldump -u basedatos -p nombrebasededatos nombreTabla > archivo.sql
+	
+

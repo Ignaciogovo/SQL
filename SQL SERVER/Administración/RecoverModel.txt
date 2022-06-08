@@ -1,0 +1,89 @@
+Recovery model:
+
+Verlo:
+	SELECT name, recovery_model_desc  
+	FROM sys.databases  
+	where name ='nombrebbdd'
+
+Otra opción:
+	Use master
+	GO
+	SELECT DATABASEPROPERTYEX('nombrebbdd', 'Recovery') As [Recovery Model]
+	GO
+
+cambiarlo en una base de datos:
+	alter database nombre_bbdd
+	set recovery full;
+	go
+
+
+	Cambiar el modelo de recuperación de una base de datos romperá la cadena de backup.
+	Por lo tanto, como práctica recomendada, se debe realizar inmediatamente la copia de seguridad completa de la base de datos después de cambiar el modelo de recuperación.
+
+
+Hay 3 opciones:
+
+	- Simple
+		-- Solo permite hacer una restauración de un backup completo
+					Se recomienda no cambiar el modelo de recuperación de bases de datos del sistema TempDB de SIMPLE. 
+					Durante el reinicio de SQL Server, se vuelve a crear una base de datos TempDB con el modelo de recuperación SIMPLE.
+
+	
+	truncará automáticamente el archivo de registro transaccional durante los siguientes escenarios:
+		-Siempre que el archivo de registro de transacciones esté lleno al 70%
+		-Un comando CHECKPOINT se ejecuta internamente o se ejecuta manualmente
+		-Siempre que la parte activa del archivo de registro de transacciones supere el tamaño que SQL Server podría recuperar dentro del tiempo especificado en el parámetro de intervalo de recuperación (min) mediante SP_CONFIGURE.
+
+
+	¿Cuando elegir simple?
+		-La base de datos se está ejecutando actualmente en entornos de desarrollo, pruebas o control de calidad
+		-Los datos no son críticos para la organización y se pueden recrear muy fácilmente y en menos tiempo
+		-Los datos rara vez cambian o permanecen más o menos estáticos durante un período de tiempo importante
+		-Está bien perder cualquiera / todas las transacciones desde la última vez que se realizó una copia de seguridad exitosa de la base de datos
+		-No está interesado en lograr la recuperación puntual de una base de datos
+
+	-Full
+		-- Ofrece multiples formas de recuperación de la backup
+		-- Se necesita el registro de transacciones.
+
+
+	¿Cuando elegir full?
+		-Los datos son muy críticos para la organización y no pueden permitirse ninguna pérdida de datos.
+		-A uno le gustaría lograr la recuperación puntual de una base de datos
+		-Si desea configurar y utilizar la opción de alta disponibilidad Creación de reflejo de base de datos
+
+
+	--Bulk-logged 
+		-- La recuperación puntual de la base de datos solo es posible si el último registro de transacciones no tiene ninguna operación BULK-LOGGED.
+
+
+	¿Cuando elegir bulk-logged?
+		-Los datos son críticos para la organización, pero le gustaría reducir el tamaño del
+		 archivo de registro transaccional durante las operaciones SELECT INTO, BULK INSERT, BCP, CREATE INDEX, ALTER INDEX y REBUILD INDEX, etc. y puede permitirse cualquier pérdida de datos causada por la ejecución de cualquiera de las operaciones mencionadas anteriormente.
+		-Todavía se puede lograr la recuperación puntual de una base de datos siempre que tenga la última copia de
+		 seguridad del registro transaccional y no tenga ninguna transacción REGISTRADA MASIVAMENTE.
+		-Se puede utilizar cuando se ejecutan trabajos por lotes o durante el tiempo en que se realiza e
+		l mantenimiento de rutina. Sin embargo, tenga en cuenta que el cambio en el modelo de recuperación romperá la cadena de copia de seguridad, por lo tanto, asegúrese de realizar una copia de seguridad completa después de cambiar el modelo de recuperación.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://www.mytechmantra.com/sql-server/different-sql-server-recovery-models-step-by-step-tutorial-with-examples/
+
+

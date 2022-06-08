@@ -1,0 +1,16 @@
+CAST:
+	SELECT CAST(edad as varchar) from tabla
+		--> Convierte a otro tipo de dato
+	Ejemplo:
+	cast((cantidad/precio) as numeric(4,2)) --> Para redondear
+
+CONVERT:
+
+	select convert(varchar,fecha,101) --> 01/30/2020
+	select convert(varchar,fecha,102) --> 2020.01.30
+	select convert(varchar,fecha,103) --> 30/01/2020
+	select convert(varchar,fecha,104) --> 30.01.2020
+	select convert(varchar,fecha,105) --> 30-01-2020
+	
+	select convert(varchar,fecha,109) --> Ene 30 2020 00:00:00 AM
+	select convert(varchar,fecha,120) --> 2020-01-30 00:00:00

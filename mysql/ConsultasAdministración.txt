@@ -1,0 +1,42 @@
+
+
+operaciones que está realizando actualmente el conjunto de subprocesos que se ejecutan dentro del servidor
+	SHOW [FULL] PROCESSLIST
+
+
+Conocer usuarios:
+	select user,host from mysql.user; 
+
+
+INFORMATION_SCHEMA
+
+	Conocer cuanto espacio ocupa cada base de datos:
+		SELECT table_schema AS "BASE DE DATOS",
+		ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS "Tamaño (MB)"
+		FROM information_schema.TABLES
+		GROUP BY table_schema;
+
+
+	Mostrar numero de conexiones por cada usuario
+		SELECT USER, COUNT(*) FROM information_schema.processlist GROUP BY USER;
+	
+	Mostrar número de conexiones por cada host
+		SELECT HOST, COUNT(*) FROM information_schema.processlist GROUP BY HOST;
+
+	Mostrar actividad del usuario root
+		SELECT * FROM information_schema.processlist WHERE USER = 'root';
+
+	Mostrar procesos asociados con consultas select o update:
+		SELECT * FROM information_schema.processlist WHERE INFO LIKE 'SELECT%';
+
+		SELECT * FROM information_schema.processlist WHERE INFO LIKE 'UPDATE%';
+
+	Mostrar tiempo medio de consulta para cada base de datos
+		SELECT DB, AVG(TIME) FROM information_schema.processlist GROUP BY DB;
+
+
+
+EXPLAIN:
+	Devuelve una tabla con una serie de filas con información sobre cada una de las tablas empleadas en la consulta.
+	
+	EXPLAIN SELECT * FROM mi_tabla;

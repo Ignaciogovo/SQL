@@ -1,0 +1,81 @@
+Simulación de corromperse el fichero .mdf (el fichero de los datos)
+
+
+1Creando una basee de datos:
+	CREATE DATABASE testdb on primary(
+		NAME = 'tesdb_data',
+		FILENAME = N'C:\DATA\testdb_data.mdf')
+	LOG ON (
+		name = 'testdb_log',
+		filename = N'C:\DATA\testdb_log.ldf',
+		size = 50 MB,
+		filegrowth = 10 MB);
+	GO
+
+2 la ponemos recovery full:
+	ALTER DATABASE testdb
+		SET RECOVERY FULL;
+	GO
+
+3 Creamos una tabla: 
+	CREATE TABLE testTable(
+	c1 INT IDENTITY PRIMARY KEY,
+	c2 VARCHAR(100)	
+	);
+	GO
+4 Insertamos datos
+	INSERT INTO testable
+		VALUES('Row inserted: transaction #1');
+	go
+
+5 Take a full backup:
+	BACKUP DATABASE testdb TO
+		DISK = 'C:\bb\testdb.bak'
+	with init,stats,stats;
+	go
+
+
+6 Insertamos más datos
+	SET NOCOUNT ON;
+	insert into testTable
+		values('Insert more rows...');
+	GO 1000
+
+
+7 Simulamos un crash del sistema
+	SHUTDOWN WITH NOWAIT;
+	GO
+	Eliminamos el archivo:
+		C:\DATA\testdb_data.mdf
+
+
+8 Activamos el ser servicio en el cmd como administrador: 
+	net start mssqlserver
+
+9 Comprobamos el fallo:
+	USE testdb;
+	go
+
+10 Comprobamos porque motivo es el fallo:
+	xp_readerrorlog
+
+11 Intentamos realizar un backup del log de transacciones
+	BACKUP LOG tesTdb TO
+		DISK = 'C:\bb\testdb_tail.trn'
+	WITH INIT, STATS,NO_TRUNCATE;
+	go
+12 Intentamos restaurar backups
+	RESTORE DATABASE testdb FROM
+		DISK = 'C:\bb\testdb.bak'
+	WITH REPLACE, NORECOVERY;
+	GO	
+
+13 Intentamos restaurar el backup del log:
+	RESTORE LOG testdb from
+		disk = 'C:\bb\testdb_tail.trn'
+	with REPLACE;
+	go
+
+14 Comprobacion de restauración de la base de datos:
+	use testdb
+	select * from testTable order by c1 desc

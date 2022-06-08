@@ -1,0 +1,116 @@
+CREAR USUARIO:
+	CREATE USER myuser WITH PASSWORD 'passwd';
+	Tambien:
+	CREATE ROLE myuser WITH LOGIN PASSWORD 'passwd';  -----> CREATE USER is equivalent to CREATE ROLE except that CREATE USER includes LOGIN by default, while CREATE ROLE does not.
+	CREATE ROLE group_role; --> Los grupos de roles nunca deben ir con privilegio de login
+
+ROLES:
+	CREATE ROLE name;
+	DROP ROLE name;
+	Consultar los roles de una base de datos:
+		SELECT rolname from pg_roles;
+	\du --> listar los roles existentes en la base de datos
+
+	ALTER:
+		alter role nombre_rol with atributo
+			Ejemplos:
+				ALTER ROLE fred VALID UNTIL 'infinity';
+				ALTER ROLE miriam CREATEROLE CREATEDB;
+				ALTER ROLE davide WITH PASSWORD NULL;
+
+
+
+Crear superusuasrio:
+
+	ALTER USER mysuper WITH SUPERUSER;
+	# or even better
+	ALTER USER mysuper WITH SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN REPLICATION
+Atributos:      
+      SUPERUSER | NOSUPERUSER
+    | CREATEDB | NOCREATEDB --> Crear bbdd
+    | CREATEROLE | NOCREATEROLE --> Crear roles
+    | INHERIT | NOINHERIT  --> Un rol "hereda" los privilegios de los roles de los que es miembro. INHERIT es el valor predeterminado.
+    | LOGIN | NOLOGIN --> Tener acceso
+    | REPLICATION | NOREPLICATION --> Un rol puede iniciar la replicación por streaming o poner el sistema dentro y fuera del modo de copia de seguridad. NOREPLICATION es el valor predeterminado para todos los roles excepto los superusuarios. Requiere el atributo LOGIN
+    | BYPASSRLS | NOBYPASSRLS --> Un rol omite todas las directivas de seguridad de nivel de fila (RLS). NOBYPASSRLS es el valor predeterminado. Debe ser un superusuario para crear un nuevo rol que tenga el atributo BYPASSRLS.
+    | CONNECTION LIMIT connlimit --> Limitar conexiones a la vez
+    | [ ENCRYPTED or UNENCRYPTED ] PASSWORD 'password' | PASSWORD NULL
+    | VALID UNTIL 'timestamp' --> Limitar la validación a partir del tiempo
+
+
+
+
+
+
+
+
+
+PRIVILEGIOS
+		cambiar de propietario: ALTER TABLE table_name OWNER TO new_owner;	
+
+
+	SELECT
+	INSERT
+	UPDATE
+	DELETE
+	TRUNCATE
+	REFERENCES  ----> Permite la creación de una restricción de clave externa que hace referencia a una tabla o columna(s) específica(s) de una tabla.
+	TRIGGER
+	CREATE
+	CONNECT
+	TEMPORARY  --> Permite crear tablas temporales
+	EXECUTE --> Permite ejecutar procedures y funciones
+	USAGE  --> permite el uso del lenguaje para la creación de funciones en ese lenguaje.
+	ALL
+
+	Ejemplos:
+		GRANT SELECT, UPDATE, INSERT ON mytable TO admin;
+		GRANT SELECT (col1), UPDATE (col1) ON mytable TO miriam_rw; --> Columnas especificas
+
+
+
+		MAS EJEMPLOS:
+			-- Rol solo lectura
+			CREATE ROLE readonly;
+			GRANT CONNECT ON DATABASE mydatabase TO readonly; --> conectarse a la base de datos
+			GRANT USAGE ON SCHEMA myschema TO readonly;	  --> otorgar acceso al uso de este rol a su esquema. Supongamos que el esquema se llama myschema
+			GRANT SELECT ON ALL TABLES IN SCHEMA myschema TO readonly; --> Otorgar permisos de todas las tablas, vistas etc...
+				o GRANT SELECT ON TABLE mytable1, mytable2 TO readonly; --> Otorgar permisos de x tablas
+			ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT ON TABLES TO readonly;  --> Poner por defecto select a las futuras las tablas, vistas etc..
+
+			-- Rol lectura-escritura
+			CREATE ROLE readwrite;
+			GRANT CONNECT ON DATABASE mydatabase TO readwrite;
+			GRANT USAGE, CREATE ON SCHEMA myschema TO readwrite; ---->Si desea permitir que este rol cree nuevos objetos como tablas de este esquema
+				o GRANT USAGE ON SCHEMA myschema TO readwrite;  ---> Para no crear objetos
+			GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA myschema TO readwrite;
+			ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO readwrite; --> Por defecto a las futuras tablas, vistas, etc...
+			GRANT USAGE ON ALL SEQUENCES IN SCHEMA myschema TO readwrite;
+			ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT USAGE ON SEQUENCES TO readwrite;
+	
+			-- Creacion de usuarios
+			CREATE USER reporting_user1 WITH PASSWORD 'some_secret_passwd';
+			CREATE USER reporting_user2 WITH PASSWORD 'some_secret_passwd';
+			CREATE USER app_user1 WITH PASSWORD 'some_secret_passwd';
+			CREATE USER app_user2 WITH PASSWORD 'some_secret_passwd';
+
+			-- Concediendo permisos a usuarios
+			GRANT readonly TO reporting_user1;
+			GRANT readonly TO reporting_user2;
+			GRANT readwrite TO app_user1;
+			GRANT readwrite TO app_user2;
+
+
+Revocar permiso public:
+
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON DATABASE mydatabase FROM PUBLIC;
+
+
+
+
+Ejemplo permisos: https://aws.amazon.com/es/blogs/aws-spanish/managing-postgresql-users-and-roles/
+Privilegios: https://www.postgresql.org/docs/current/ddl-priv.html
+Alter roles: https://www.postgresql.org/docs/current/sql-alterrole.html
+Significados de los atributos: https://www.postgresql.org/docs/9.6/sql-createrole.html
+https://www.qualoom.es/blog/administracion-usuarios-roles-postgresql

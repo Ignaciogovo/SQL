@@ -1,0 +1,418 @@
+1 Condicones
+	1.1 Regexp
+	1.2 LIKE
+	1.3 HAVING
+	1.4 Distinct
+	1.5 Between
+	1.6 IN
+	1.7 LIMIT y OFFSET
+	1.8 CASE
+2 SubConsultas
+	2.1 Subconsulta en el select
+	2.2 Subconsulta en la condicion
+	2.3 Para más de un valor: CON EL "IN"
+	2.4 HACER UN UPDATE Y UN DELETE EN UNA SUBCONSULTA
+	2.5 INSERT EN SUBCONSULTAS
+	2.6 ALL
+	2.7 ANY o SOME
+	2.8 subconsultas en el from
+	2.9 WITH as
+3 Operadores relacionales
+4 Operadores logicos
+5 Consultas agrupadas (GROUP BY)
+	5.1 with rollup
+	5.2 grouping
+6 Order by
+7 join
+
+8 OVER
+
+9 Operadores(union,unionall...)
+	9.1 UNION
+	9.2 UNION ALL
+	9.3 EXEPT
+	9.4 INTERSECT  
+
+
+1 Condicones
+	
+	1.1 Regexp:
+		select * from tabla
+		where nombre regexp 'a' --> Todos los nombres que contengan la letra a
+		
+		- regexp '^a' --> Que comiencen por a
+		- regexp 'a$' --> Que terminen por a
+		- regexp 'n[ue]' --> Que contenga nu o ne
+		- regexp 'n[a-e]' --> Que contenga entre na nb... hasta ne		
+		- regexp 'nu|ne' --> Que contenga nu o ne
+		
+		- No distingue entre mayusculas y minusculas
+		- Es seleccionado mientras la condición se encuentre en el texto(Sea una parte o todo el texto)
+
+	1.2 LIKE:
+		Select * from tabla
+		where nombre like '%i_'    -> consultas los nombres que tengan una i como penultima palabra
+
+
+
+
+	1.3 HAVING:
+		select nombre, salario from datos
+		where nombre like 'J%'
+		group by nombre, salario
+		having salario > 800   ---> Excluye todos los salarios menores de 800
+
+
+
+	1.4 Distinct:
+		select distinct nombre from plantilla --> Oculta valores repetidos
+
+
+	1.5 Between:
+		select * from plantilla
+		where salario between 800 and 1000  --> Entre estos valores
+		
+		select * from plantilla
+		where salario not between 800 and 1000 --> No entre estos valores
+
+		select * from plantilla
+		where nombre between 'A' and 'K' --> Escoger entre los que empiecen por A hasta K
+
+
+	1.6 IN:
+		SELECT * FROM plantilla
+		where id  IN (2,3,11,5) ---> Sustituye a : "WHERE id = 2 OR id = 3 OR id = 11 OR id = 5"
+		where id not in (2,3,11,5)
+
+	1.7 LIMIT y OFFSET:
+		select * from plantilla limit 3 offset 4 ---> Muestras 3 registros a partir del cuarto
+
+		select * from tabla
+		limit 6 --> Devuelve los 6 primeros registros
+	
+		select * from tabla
+		limit 5,6 --> Devuelve 6 registros empenzando por el quinto
+
+
+	1.8 CASE:
+		Se puede usar en consultas:
+			select pais, precio,
+		    		case when pais = "Turkey" then 'Vuelo retrasado'
+		        	     when pais = "Peru" then 'Vuelo con escalas'
+		        	     else 'Vuelo normal
+		     		END as tipo_viaje
+			from vuelos     
+
+
+
+
+
+2 SubConsultas
+
+
+	2.1 Subconsulta en el select:
+		select dato1, dato2, (select datos from tabla... where datos=dato2) from tabla
+			Ejemplo: los empleados con el nombre de su departamento: 
+				select fname, salary,departmentid, (select name from departments where id= departmentid ) 
+				from employees
+
+
+
+	2.2 Subconsulta en la condicion
+		select dato1, dato2 from tabla where condicion = (select ....)
+			Ejemplo: El departamento con la media de sueldo más alta:
+				select name 
+				from departments 
+				where id = (select departmentid from employees group by departmentid order by avg(salary) desc limit 1)
+
+	
+
+	2.3 Para más de un valor: CON EL "IN"
+		Ejemplo: Como el anterior pero no solo un departamento:
+			select name 
+			from departments 
+			where id in (select departmentid from employees group by departmentid order by avg(salary) desc)
+
+
+	
+
+
+	2.4 HACER UN UPDATE Y UN DELETE EN UNA SUBCONSULTA:
+		-UPDATE tabla set columna = (SELECT ....)
+			where condicion
+		-UPDATE tabla set columna = "Valor"
+			where condicion =/in (select .....)
+		
+		-DELETE from tabla where condicion =/in (select.....)
+
+
+
+
+	2.5 INSERT EN SUBCONSULTAS:
+		-INSERT into tabla select columna1,columna2 from tabla2 where
+
+
+	2.6 ALL
+
+		select * from personas 
+		where edad > all( select edad from clientes) Selecciona donde personas.edad sea mayor que cualquier clientes.edad ya que coge el mayor de todos clientes.edad
+
+	2.7 ANY o SOME 
+		x > ANY(1,2)	 --> X>1
+		X < ANY(1,2) 	--> x<2
+		x = ANY(1,2) 	--> x in (1,2)
+		x <> any(1,2)	--> (x<>1) or (x<>2)
+
+	2.8 subconsultas en el from
+		select dato1, dato2 from ( select * from tabla1)
+
+	2.9 WITH as ---> Permite añadir a una "variable" una subconsulta
+		with alias_consulta as
+			(select * from tabla1)
+		
+		select * from alias_consulta
+
+
+3 Operadores relacionales
+	< menor que
+	> mayor que
+	<> distinto de
+	<= menor o igual que
+	>= mayor o igual que
+	= igual que
+
+
+
+
+4 Operadores logicos
+	AND - Y
+	OR - O
+	NOT- NO
+
+
+5 Consultas agrupadas (GROUP BY)
+		SELECT COUNT(*)
+		FROM TABLA 		->Numero total de registros
+
+
+		SELECT  columna, COUNT(*)
+		FROM tabla
+		GROUP BY columna 	->Se contara todos los registros con el mismo valor de la columna y calculara su cuenta
+
+
+
+		SELECT columna, SUM(columna)
+		FROM tabla
+		GROUP BY columna
+
+
+		5.1 with rollup --> Indica un resumen de la agrupacion
+					Ejemplo: Agrupar equipos por la nacionalidad de sus jugadores e indicar el valor medio de cada nacionalidad
+					select  club.nombre as club, nacionalidad, round(avg(valor),0) as valorMedio
+					from jugadores
+					inner join club
+					on club.id= jugadores.id_club
+					group by club,nacionalidad with rollup
+
+						--> Resultado:# club, nacionalidad, valorMedio
+								 NULL, NULL, '24160241'              --> with rollup indica el valor medio de todo el equipo
+								'AC Milán', 'Algeria', '33500000'
+								'AC Milán', 'Belgium', '15500000'
+								'AC Milán', 'Bosnia and Herzegovina', '6000000'
+								'AC Milán', 'Brazil', '13500000'
+								'AC Milán', 'Côte d\'Ivoire', '49500000'
+								'AC Milán', 'Croatia', '27500000'
+
+		5.2 grouping()----->
+				La función GROUPING se puede utilizar en el ejemplo anterior para diferenciar los NULL producidos por ROLLUP de los NULLs de los datos agrupados.
+				La función GROUPING para una columna devuelve un valor de 1 cuando el VALOR NULO generado para esa columna es el resultado de la operación ROLLUP. 
+				De lo contrario, devuelve un valor de 0.
+				SELECT a, b, SUM(c) as SUM, GROUPING(a), GROUPING(b) FROM t1 GROUP BY a,b WITH ROLLUP;
+		+------+------+------+-------------+-------------+
+		| a    | b    | SUM  | GROUPING(a) | GROUPING(b) |
+		+------+------+------+-------------+-------------+
+		| NULL |  112 | NULL |           0 |           0 |
+		| NULL | NULL | NULL |           0 |           1 |
+		|  111 |   11 |   11 |           0 |           0 |
+		|  111 |   12 |   12 |           0 |           0 |
+		|  111 | NULL |   23 |           0 |           1 |
+		|  222 |   22 |   22 |           0 |           0 |
+		|  222 |   23 |   23 |           0 |           0
+6 Order by 
+	select * from tabla
+	order by nombre desc|asc;
+	
+	-- Orden personalizado:
+		field(columna, valor1, valor2) --> Pone valor1 los primeros y valor2 los segundo, los demás por orden aleatorio
+
+
+7 join 
+
+
+	join con una sola tabla
+		select * from personas
+		join personas as jefes
+		on personas.id_jefe=jefes.id
+
+
+	left right  join
+
+
+	Using:
+		select count(*) from employees 
+		inner join titles using(nombre_columna_comun) 	tiene que ser el mismo nombre
+
+
+
+
+
+8 OVER
+
+	Funciones Ventanas:
+	OVER:
+		OVER(partition by columna)
+		OVER(order by columna)
+		OVER( range columna) ----> 		RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING -- Conjuto entre el primero y el ultimo registro.
+							RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW -- conjunto entre el comienzo y el registro corriente.
+							RANGE BETWEEN CURRENT ROW AND UNBOUNDED PRECEDING -- Conjunto entre el registro corriente y el final
+
+
+
+	Enumera ventanas
+		ROW_NUMBER()  OVER   --> 				ROW_NUMBER()  OVER ( [ PARTITION BY value_expression , ... [ n ] ] order_by_clause )
+		RANK()	      OVER   --> clasificacion de valor 	Ejemplo: RANK() OVER ( partition_by_clause  order_by_clause )
+		RANK_DENSE()  OVER   --> Clasificación de un valor en un grupo de valores   Ejemplo:    DENSE_RANK() OVER (PARTITION BY expr_list ORDER BY order_list)
+
+	
+
+
+	LAG(columna) over( ....)---> el registro anterior
+	lead(columna) OVER(...) --> El registro posterior
+
+	FIRST_VALUE(columna) --> El primer registro
+	LAST_VALUE(columna) --> El ultimo registro
+	nth_value(columna,posicion)
+
+
+
+
+
+	Ejemplo:::
+		--Consulta de estadisticas de salario de los trabajadores:
+			select employees.id, fname, lname, salary, 
+				round(avg(salary) over(order by salary RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING),2) as media_total, -- Media del salario entre todos los trabajadores
+				round(avg(salary) over (partition by departmentid),2) as media_departamento,	-- Media del salario de cada departamento
+				ag(employees.id) over(order by salary desc), -- incluir el trabajador por encima del registro con más salario
+			d.name
+			from employees inner join departments as d on departmentid=d.id;
+
+
+
+
+
+
+
+9 Operadores(union,unionall...)
+	9.1 UNION --> combina el resultado de dos o mas columnas
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			UNION
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 1,2,3,4,5
+	9.2 UNION ALL --> combina el resultado de dos o mas columnas manteniendolo todo
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			UNION ALL
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 1,2,3,3,4,5
+
+		
+	9.3 EXEPT --> enumera las filas en el primero que no están en el segundo.
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			EXEPT
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 1,2
+
+
+	9.4 INTERSECT --> mantiene las filas que son comunes a todas las consultas.
+			(
+			    SELECT 1 ID
+			    UNION
+			    SELECT 2
+			    UNION
+			    SELECT 3
+			)
+			INTERSECT
+			(
+			    SELECT 3
+			    UNION
+			    SELECT 4
+			    UNION
+			    SELECT 5
+			);
+			Resultado: 3
+
+
+
+9 Sacar la edad a partir de la fecha de nacimiento:
+	SELECT TIMESTAMPDIFF(YEAR,FechaNac,CURDATE()) AS edad
+     	FROM clientes;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Operadores(union,unionall...): https://www.sqlshack.com/es/revision-ejemplos-y-uso-de-sql-union/

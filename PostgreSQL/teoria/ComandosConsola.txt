@@ -1,0 +1,42 @@
+Acceder a postgresql: psql -U postgres -h direccionIP(Opcional)
+
+\l mostrar las DDBB
+
+\c nombre_DDBB -- Acceder a la base de datos
+
+\dt --> muestra las tablas
+
+\h --> Ayuda
+
+\conninfo --> mostrar información sobre la conexión actual
+\q  -->salir
+exit ---> salir al terminal
+
+
+Mostrar usuarios:
+	select * from "pg_user";
+	# también
+	\du --> Muestra atributos
+
+
+
+
+
+
+Consultar el tamaño de las tablas en una base de datos:
+	SELECT pg_size_pretty(pg_database_size('dbname'));
+
+
+
+Cambiar de propietario la base de datos:
+
+	ALTER DATABASE database_name OWNER TO new_owner;
+
+
+
+
+
+
+
+
+https://apuntes-snicoper.readthedocs.io/es/latest/programacion/postgresql/comandos_consola_psql.html

@@ -1,0 +1,357 @@
+1 Backup
+	1.1 OPCIONES
+	1.2 Copia de seguridad completa
+	1.3 Copia de seguridad diferencial
+	1.4 Copia de seguridad de registro de transacciones
+	1.5 Copia de seguridad mirror
+	1.6 copia de seguridad full file usando el comando TSQL
+	1.7 Parcial
+	1.8 Permisos necesarios para realizar copias de seguridad
+2 restore
+	2.1 Script TSQL para crear una base de datos con varios archivos de datos en el archivo principal y
+		de solo lectura en el grupo de archivos secundario:
+	2.2 Errores al restaurar un backup differencial
+	2.3 Problemas
+		2.3.1 'contiene una copia de una base de datos distinta de la existente' and filelistonly
+
+
+
+
+
+
+
+ 
+1 Backup
+
+	USE nombre_bbdd;
+	backup database nombre_bbdd
+	to disk = 'd:\ruta\del\archivo\nombre_bbdd.bak'
+	with format, --> Indica que es la primera copia de seguridad que se va hacer
+	     medianame = 'CopiaNombre_bbdd'
+	     name = ' Copia de facturas' --> Una especie de descripcion
+	;
+
+
+	1.1 OPCIONES-
+		NOFORMAT --> Especifica que la operación de copia de seguridad conservará los conjuntos de copias de seguridad y el encabezado de medios existentes en los volúmenes de medios usados en esta operación de copia de seguridad. Este es el comportamiento predeterminado.
+		FORMAT --> Especifica que se debe crear un conjunto de medios nuevo. FORMAT hace que la operación de copia de seguridad escriba un nuevo encabezado de medios en todos los volúmenes de medios usados en la operación de copia de seguridad
+
+		NOINIT --> Indica que el conjunto de copia de seguridad se anexa al conjunto de medios especificado, conservando así los conjuntos de copia de seguridad existentes. Si se ha definido una contraseña para el conjunto de medios, debe proporcionarla.
+		INIT --> Especifica que se deben sobrescribir todos los conjuntos de copia de seguridad, pero conserva el encabezado de medios. Si se especifica INIT, se sobrescriben todos los conjuntos de copia de seguridad existentes en el dispositivo, si las condiciones lo permiten
+
+		NOSKIP --> Indica a la instrucción BACKUP que compruebe la fecha de expiración de todos los conjuntos de copia de seguridad de los medios antes de permitir que se sobrescriban. Este es el comportamiento predeterminado.
+		SKIP --> Deshabilita la comprobación de la expiración y el nombre del conjunto de copia de seguridad que suele realizar la instrucción BACKUP para impedir que se sobrescriban los conjuntos de copia de seguridad.
+
+		NOREWIND --> Especifica que SQL Server mantendrá la cinta abierta tras la operación de copia de seguridad. Puede utilizar esta opción como ayuda para mejorar el rendimiento al realizar varias operaciones de copia de seguridad en una cinta.
+		REWIND --> Especifica que SQL Server libera y rebobina la cinta. REWIND es la opción predeterminada.
+
+		NOUNLOAD --> Especifica que, tras la operación de BACKUP, la cinta permanece cargada en la unidad de cinta.
+		UNLOAD --> Especifica que la cinta se rebobina y descarga automáticamente al terminar la copia de seguridad. UNLOAD es el valor predeterminado cuando se inicia una sesión.
+
+		NO_COMPRESSION --> Deshabilita de forma explícita la compresión de copia de seguridad.
+		COMPRESSION --> Habilita de forma explícita la compresión de copia de seguridad.
+		
+
+		DIFFERENTIAL --> Indica que es una copia de seguridad diferencial.
+
+		COPY_ONLY   --> Se puede realizar una copia de seguridad de la base de datos sin afectar a los procedimientos generales de copia de seguridad y restauración de la base de datos.
+	
+		STATS 	  ---> Stats muestra un mensaje de porcentaje completo cuando se realiza la copia de seguridad. El valor predeterminado de las estadísticas es 10, por lo que lo muestra 10 en 10
+				Ejemplo: STATS = 10 --> STATS = 1 
+
+
+
+
+
+	1.2 Copia de seguridad completa:
+		BACKUP DATABASE AdventureWorks 
+		TO DISK = 'C:\DBBackups\AdventureWorks.BAK'
+		WITH NOFORMAT, NOINIT, 
+		SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 25 
+	
+		/*Verificar copia de seguridad se ha completado con éxito*/
+	
+		RESTORE VERIFYONLY
+		FROM DISK = 'C:\DBBackups\AdventureWorks.BAK'
+		GO
+
+
+
+
+
+	1.3 Copia de seguridad diferencial:
+		-- solo registrará los datos que han cambiado desde la última copia de seguridad completa
+
+
+		BACKUP DATABASE MyTechMantra
+		TO DISK = 'C:\DBBackups\MyTechMantra.DIF'
+		WITH DIFFERENTIAL, NOFORMAT, NOINIT,
+		SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 25
+	
+		/*Verificar copia de seguridad se ha completado con éxito*/
+	
+		RESTORE VERIFYONLY
+		FROM DISK = 'C:\DBBackups\MyTechMantra.DIF'
+		GO
+
+
+
+
+
+
+
+	1.4 Copia de seguridad de registro de transacciones
+		--solo es posible cuando la base de datos está en el modelo de recuperación FULL o BULK-LOGGED. 
+
+
+
+
+		BACKUP LOG MyTechMantra
+		TO DISK = 'C:\DBBackups\MyTechMantra.TRN'
+		WITH NOFORMAT, NOINIT, 
+		SKIP, NOREWIND, NOUNLOAD, COMPRESSION, STATS = 25 
+	
+		/*Verificar copia de seguridad se ha completado con éxito*/
+	
+		RESTORE VERIFYONLY
+		FROM DISK = 'C:\DBBackups\MyTechMantra.TRN'
+		GO
+
+
+	1.5 Copia de seguridad mirror:
+		--Hace tres copias de seguridad identicas en distintos discos:
+
+
+		Completa:
+			BACKUP DATABASE AdventureWorks
+			TO DISK = 'D:\DatabaseBackups\AdventureWorks.bak'
+			MIRROR TO DISK = 'E:\DatabaseBackups\AdventureWorks_MirrorCopyOne.bak'
+			MIRROR TO DISK = 'F:\DatabaseBackups\AdventureWorks_MirrorCopyTwo.bak'
+			MIRROR TO DISK = 'G:\DatabaseBackups\AdventureWorks_MirrorCopyThree.bak'
+			WITH FORMAT
+			GO
+
+
+		Diferencial:
+			BACKUP DATABASE AdventureWorks
+			TO DISK = 'D:\DatabaseBackups\AdventureWorks.bak'
+			MIRROR TO DISK = 'E:\DatabaseBackups\AdventureWorks_MirrorCopyOne.bak'
+			MIRROR TO DISK = 'F:\DatabaseBackups\AdventureWorks_MirrorCopyTwo.bak'
+			MIRROR TO DISK = 'G:\DatabaseBackups\AdventureWorks_MirrorCopyThree.bak'
+			WITH DIFFERENTIAL
+			GO
+
+		Log de transacciones:
+			BACKUP LOG AdventureWorks
+			TO DISK = 'D:\DatabaseBackups\AdventureWorks.bak'
+			MIRROR TO DISK = 'E:\DatabaseBackups\AdventureWorks_MirrorCopyOne.trn'
+			MIRROR TO DISK = 'F:\DatabaseBackups\AdventureWorks_MirrorCopyTwo.trn'
+			MIRROR TO DISK = 'G:\DatabaseBackups\AdventureWorks_MirrorCopyThree.trn'
+			GO
+
+
+
+
+
+
+
+		Comprobar:
+			RESTORE VERIFYONLY FROM DISK = 'D:\DatabaseBackups\AdventureWorks.bak'
+			RESTORE VERIFYONLY FROM DISK = 'E:\DatabaseBackups\AdventureWorks_MirrorCopyOne.trn'
+			RESTORE VERIFYONLY FROM DISK = 'F:\DatabaseBackups\AdventureWorks_MirrorCopyTwo.trn'
+			RESTORE VERIFYONLY FROM DISK = 'G:\DatabaseBackups\AdventureWorks_MirrorCopyThree.trn'
+
+
+
+
+
+
+	1.6 copia de seguridad full file usando el comando TSQL
+		BACKUP DATABASE [MyTechMantra] 
+		FILE = N'MyTechMantra_Data2' 
+		TO DISK = N'C:\DBBackups\MyTechMantra_MyTechMantra_Data2.bck' 
+		WITH NOFORMAT, NOINIT, COMPRESSION, STATS = 25
+		GO
+
+
+
+	1.7 Parcial:
+	 una copia de seguridad parcial contiene los datos del grupo de archivos principal, cada grupo de archivos de lectura y escritura y, opcionalmente, uno o más archivos de solo lectura
+
+		Copia de seguridad diferencial Completa
+			BACKUP DATABASE [MyTechMantra] READ_WRITE_FILEGROUPS
+			TO DISK = 'C:\DBBackups\MyTechMantra_Partial.BAK'
+			WITH NOFORMAT, NOINIT, COMPRESSION, STATS = 25
+			GO
+
+
+
+
+		Copia de seguridad Diferencial Parcial:
+			BACKUP DATABASE [MyTechMantra] READ_WRITE_FILEGROUPS
+			TO DISK = 'C:\DBBackups\MyTechMantra_Partial.DIF'
+			WITH DIFFERENTIAL, COMPRESSION, STATS = 25
+			GO
+
+
+
+
+	1.8 Permisos necesarios para realizar copias de seguridad:
+		CREATE LOGIN BackupRestoreAdmin WITH PASSWORD='$tr0ngP@$$w0rd'
+		GO
+		CREATE USER BackupRestoreAdmin FOR LOGIN BackupRestoreAdmin
+		GO
+		EXEC sp_addsrvrolemember 'BackupRestoreAdmin', 'dbcreator'
+		GO
+		EXEC sp_addrolemember 'db_owner','BackupRestoreAdmin'
+		GO
+
+
+
+
+	1.9 Tail log backup
+		Cuando hacer un tail log backup:
+			-La base de datos está actualmente ONLINE y está planeando realizar la operación de restauración en
+	 		la base de datos y luego comenzar haciendo una copia de seguridad de la cola del registro. 
+			Para evitar cualquier error para una base de datos ONLINE, debe utilizar el ... Opción WITH NORECOVERY de la instrucción BACKUP Transact-SQL.
+	
+			-Si una base de datos está DESCONECTADA y no se inicia y necesita restaurar la base de datos,
+			primero haga una copia de seguridad de la cola del archivo de registro de transacciones.
+			 Debido a que no pueden ocurrir transacciones durante ese tiempo, es opcional usarWITH NORECOVERY durante dichos momentos.
+
+			-Si una base de datos está DAÑADA, intente realizar una copia de seguridad del registro de cola
+			utilizando WITH CONTINUE_AFTER_ERROR opción de la instrucción BACKUP.
+
+
+		Opciones
+			-NORECOVERY:tiene la intención de continuar con una operación de restauración de la base de datos después de la copia
+		 	de seguridad correcta del archivo de registro de transacciones. La opción NORECOVERY lleva la base de datos al estado 
+			de restauración. Esto garantizará que la base de datos no cambie después de que se complete la copia de seguridad del 
+			registro de cola. El registro de transacciones se trunca a menos que especifique NO_TRUNCATE opción o COPY_ONLY opción 
+			mientras ejecuta copias de seguridad del registro de transacciones.
+
+				Backup:
+					BACKUP LOG [MyTechMantra] 
+					TO DISK = 'C:\DBBackups\MyTechMantra_NORECOVERY.TRN' 
+					WITH NORECOVERY, COMPRESSION, CHECKSUM, STATS = 25
+
+			-NO_TRUNCATE: Microsoft recomienda que evite usar NO_TRUNCATE, excepto cuando la base de datos está dañada.
+
+				backup:
+					BACKUP LOG [MyTechMantra]
+					TO DISK = 'C:\DBBackups\MyTechMantra_NO_TRUNCATE.TRN'
+					WITH NO_TRUNCATE, COMPRESSION, CHECKSUM, STATS = 25
+
+
+			-CONTINUE_AFTER_ERROR: Debe especificar CONTINUE_AFTER_ERROR opción al realizar una copia de seguridad del archivo de registro transaccional
+			 solo si está realizando una copia de seguridad de la cola de una base de datos de SQL Server dañada.
+			
+				backup:
+					BACKUP LOG [MyTechMantra]
+					TO DISK = 'C:\DBBackups\MyTechMantra_NORECOVERY.TRN'
+					WITH NORECOVERY, CONTINUE_AFTER_ERROR, COMPRESSION, CHECKSUM, STATS = 25	
+
+
+2 restore: 
+	Consta de 4 fases
+		- Creación de archivos de la base de de datos(si los archivos aún no existen)
+		- Data copy. Involucra la copia de de todos los datos, registros y paginas de indices
+		- Redo(rehacer). Aplica las transacciones registradas a los datos copiados de la copia de seguridad para transferir esos datos al punto de recuperación
+		-Undo(Deshacer): Revierte cualquier transacción no confirmada( y pone la base de datos a disposición de los usuarios)
+
+
+	Realización de restore con distintos backup (Full, transaction, differential)
+		WITH RECOVERY--> Terminas la ejecución de restore
+		NORECOVERY --> sigue produciendose el restore
+
+
+
+
+
+	USE master;
+	
+	restore database nombre_bbdd
+		from disk = 'd:\ruta\del\archivo\nombre_bbdd.bak'
+
+
+
+
+
+
+
+
+
+
+
+
+	2.1 Script TSQL para crear una base de datos con varios archivos de datos en el archivo principal y
+	de solo lectura en el grupo de archivos secundario:
+		USE [master]
+		GO
+			
+		CREATE DATABASE [MyTechMantra]
+		CONTAINMENT = PARTIAL
+		ON PRIMARY 
+		( 
+		NAME = N'MyTechMantra', 
+		FILENAME = N'F:\MSSQL\DATA\MyTechMantra.mdf', 
+		SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB 
+		), 
+		( 
+		NAME = N'MyTechMantra_Data2', 
+		FILENAME = N'F:\MSSQL\DATA\MyTechMantra_Data2.ndf', 
+		SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB 
+		), 
+		FILEGROUP [ReadOnly] 
+		( 
+		NAME = N'MyTechMantra_ReadOnly', 
+		FILENAME = N'F:\MSSQL\DATA\MyTechMantra_ReadOnly.ndf',
+		SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB 
+		)
+		LOG ON 
+		( 
+		NAME = N'MyTechMantra_log', 
+		FILENAME = N'F:\MSSQL\DATA\MyTechMantra_log.ldf', 
+		SIZE = 2048KB , MAXSIZE = 2048GB , FILEGROWTH = 10%
+		)
+		GO
+
+
+	2.2 Errores al restaurar un backup differencial:
+		Codigo:
+			RESTORE DATABASE Adventureworks FROM DISK = 'D:\Adventureworks_Full_1.bak' WITH NORECOVERY
+			GO
+			RESTORE DATABASE Adventureworks FROM DISK = 'D:\Adventureworks_Diff_3.bak' WITH NORECOVERY
+			GO
+		Error:
+			This differential backup cannot be restored because the database has not been restored to the correct earlier state.
+
+
+		Solucion:
+			 necesitamos hacer es restaurar las copias de seguridad sin romper la cadena de copias de seguridad. 
+		codigo
+
+
+	2.3 Problemas 
+
+		2.3.1 'contiene una copia de una base de datos distinta de la existente' and filelistonly
+			-Miramos datos de los archivos del backup:
+				Restore filelistonly
+				 from disk ='C:\bb\backup.bak'
+			- Cogemos los LogicalName
+			- Lo Incluimos en un backup:
+				Restore database shotTestdb
+					from disk ='C:\bb\TestdbCopy_only.bak'
+					with replace,
+					MOVE 'tesdb_data' TO 'c:\DATA\shotTestdb.mdf',
+					MOVE 'testdb_log' TO 'c:\DATA\shotTestdb.ldf';
+
+
+
+Forma adecuada de restaurar: https://academy.sqlbak.com/point-in-time-recovery/
+
+
+
+
+
+Problemas con la restauración de una base de datos a otra: https://www.desarrollo-web-br-bd.com/es/sql-server/el-conjunto-de-copia-de-seguridad-contiene-una-copia-de-seguridad-de-una-base-de-datos-distinta-de-la-existente./1067414892/#:~:text=sql%2Dserver%20%E2%80%94%20El%20conjunto%20de,datos%20distinta%20de%20la%20existente.

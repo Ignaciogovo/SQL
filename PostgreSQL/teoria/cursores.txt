@@ -1,0 +1,57 @@
+do $$
+declare variable Record;
+	nombre_cursor Cursor for select columna1, columna2 from tabla   --->Declaramos cursor
+Begin
+	open nombre_cursor;
+	fetch nombre_cursor into variable;
+	Raise Notice ' columna1: %, columna2: %', variable.columna1, variable.columna2;
+
+end;
+$$
+Language plpgsql
+
+
+
+
+
+
+Como recorrerlo con un while o un for
+
+
+
+do $$
+declare variable Record;
+	nombre_cursor Cursor for select columna1, columna2 from tabla   --->Declaramos cursor
+BEGIN
+	open nombre_cursor;
+	fetch nombre_cursor into variable;
+	while (found) loop
+	Raise Notice ' columna1: %, columna2: %', variable.columna1, variable.columna2;
+	fetch nombre_cursor into variable;
+	end loop;
+end;
+$$
+Language plpgsql
+
+
+
+SELECT nombre_cursor()
+
+
+FOR:
+
+
+do $$
+declare variable Record;
+	nombre_cursor Cursor for select columna1, columna2 from tabla   --->Declaramos cursor
+BEGIN
+	open nombre_cursor;
+	for variable in nombre_cursor loop
+	Raise Notice ' columna1: %, columna2: %', variable.columna1, variable.columna2;
+	end loop;
+end;
+$$
+Language plpgsql
+
+
+

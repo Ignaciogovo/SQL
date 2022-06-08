@@ -1,0 +1,53 @@
+
+--> En estos triggers no se pueden llamar a procedures
+DELIMITER //
+CREATE TRIGGER 'nombre_trigger'
+BEFORE/AFTER UPDATE,INSERT,DELETE ON nombre_tabla
+FOR EACH ROW
+begin
+end //
+DELIMITER ;
+
+
+Ejemplo:
+DELIMITER //
+
+CREATE TRIGGER testref BEFORE INSERT ON test1
+  FOR EACH ROW BEGIN
+    INSERT INTO test2 SET a2 = NEW.a1;
+    DELETE FROM test3 WHERE a3 = NEW.a1;  
+    UPDATE test4 SET b4 = b4 + 1 WHERE a4 = NEW.a1;
+  END
+
+
+DELIMITER ;
+Comprobar si el precio de un producto ha cambiado:
+
+DELIMITER $$
+CREATE TRIGGER 'actualizarPrecioProducto'
+BEFORE UPDATE ON 'productos'
+FOR EACH ROW
+BEGIN
+  IF NEW.coste <> OLD.coste
+    THEN
+      SET NEW.precio = NEW.coste * 2;
+  END IF ;
+END$$
+DELIMITER ;
+
+NEW AND OLD
+Nos permite acceder a columnas en los registros afectados por un disipador
+    trigger de INSERT --> NEW.nombre_columna
+    trigger de DELETE --> OLD.nombre_columna
+    trigger de UPDATE --> NEW and OLD
+
+
+
+
+Para poder usar ROLLBACK
+ se puede modificar la tabla NEW si se usa el trigger tipo before:
+
+
+
+ Borrar trigger:
+ drop trigger nombre_trigger;
