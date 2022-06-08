@@ -10,6 +10,7 @@ CONSTRAINT id_trabajo FOREIGN KEY (id_trabajo) REFERENCES trabajo(id)
 ****Auto incremento ****
 	Mysql
 id int NOT NULL AUTO_INCREMENT
+	resetar: alter table nombre_de_la_tabla AUTO_INCREMENT=1;
 
 	SQL server
 id int IDENTITY(1,1) PRIMARY KEY

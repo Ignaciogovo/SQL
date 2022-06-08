@@ -8,10 +8,13 @@ delimiter ;         --> Indica donde termina el codigo
 
 
 Procedure:
-    create procedure monstrarVariable(variable1 int, variable2 int)
-    begin
-        codigo
-    end$$
+DELIMITER //
+drop procedure if exists nombre_procedure;
+create procedure exists nombre_procedure(variable1 tipo_variable, variable2 tipo_variable)
+begin
+	codigo;
+end //
+DELIMITER ;
 
     call monstrarVariable();  
 
