@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="GestionTienda">
+  <Items>
+    <LogicalFolder Name="Connections" Type="2" Sorted="true">
+      <Items>
+        <ConnectionNode Name="SANTI-I3:SANTI-I3\Santi">
+          <Created>2020-03-01T12:55:54.9441696+01:00</Created>
+          <Type>SQL</Type>
+          <Server>SANTI-I3</Server>
+          <UserName />
+          <Authentication>Windows Authentication</Authentication>
+          <InitialDB />
+          <LoginTimeout>30</LoginTimeout>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
+        </ConnectionNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Queries" Type="0" Sorted="true">
+      <Items>
+        <FileNode Name="1 SELECT TOP AS.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>1 SELECT TOP AS.sql</FullPath>
+        </FileNode>
+        <FileNode Name="2 ORDER BY ASC DESC OFFSET.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>2 ORDER BY ASC DESC OFFSET.sql</FullPath>
+        </FileNode>
+        <FileNode Name="3 WHERE LIKE NOT.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>3 WHERE LIKE NOT.sql</FullPath>
+        </FileNode>
+        <FileNode Name="4 WHERE BETWEEN.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>4 WHERE BETWEEN.sql</FullPath>
+        </FileNode>
+        <FileNode Name="5 WHERE AND OR IN.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>5 WHERE AND OR IN.sql</FullPath>
+        </FileNode>
+        <FileNode Name="6 Fechas.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>6 Fechas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="7 Operaciones Aritmeticas.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>7 Operaciones Aritmeticas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="8 GROUP BY SUM COUNT AVG MAX MIN.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>8 GROUP BY SUM COUNT AVG MAX MIN.sql</FullPath>
+        </FileNode>
+        <FileNode Name="9 HAVING.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>9 HAVING.sql</FullPath>
+        </FileNode>
+        <FileNode Name="91 CAST CONVERT.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>91 CAST CONVERT.sql</FullPath>
+        </FileNode>
+        <FileNode Name="E1 Estudio de clientes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>E1 Estudio de clientes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="E2 Informe de marcas.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>E2 Informe de marcas.sql</FullPath>
+        </FileNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">
+      <Items />
+    </LogicalFolder>
+  </Items>
+</SqlWorkbenchSqlProject>

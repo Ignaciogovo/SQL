@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<SqlWorkbenchSqlProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="CreacionTienda">
+  <Items>
+    <LogicalFolder Name="Connections" Type="2" Sorted="true">
+      <Items>
+        <ConnectionNode Name="SANTI-I3:SANTI-I3\Santi">
+          <Created>2020-02-23T14:42:55.310918+01:00</Created>
+          <Type>SQL</Type>
+          <Server>SANTI-I3</Server>
+          <UserName />
+          <Authentication>Windows Authentication</Authentication>
+          <InitialDB>Facturas</InitialDB>
+          <LoginTimeout>30</LoginTimeout>
+          <ExecutionTimeout>0</ExecutionTimeout>
+          <ConnectionProtocol>NotSpecified</ConnectionProtocol>
+          <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
+        </ConnectionNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Queries" Type="0" Sorted="true">
+      <Items>
+        <FileNode Name="CREATE TABLE Cliente.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>CREATE TABLE Cliente.sql</FullPath>
+        </FileNode>
+        <FileNode Name="CREATE TABLE Encargo.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>CREATE TABLE Encargo.sql</FullPath>
+        </FileNode>
+        <FileNode Name="CREATE TABLE Pedido.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>CREATE TABLE Pedido.sql</FullPath>
+        </FileNode>
+        <FileNode Name="CREATE TABLE Producto.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>CREATE TABLE Producto.sql</FullPath>
+        </FileNode>
+        <FileNode Name="INSERT Clientes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>INSERT Clientes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="INSERT PedidosEncargos.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>INSERT PedidosEncargos.sql</FullPath>
+        </FileNode>
+        <FileNode Name="INSERT Productos.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:SANTI-I3:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>SANTI-I3</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>INSERT Productos.sql</FullPath>
+        </FileNode>
+      </Items>
+    </LogicalFolder>
+    <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">
+      <Items />
+    </LogicalFolder>
+  </Items>
+</SqlWorkbenchSqlProject>

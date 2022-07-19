@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# SQL Server Management Studio Solution File, Format Version 18.00
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "CreacionTienda", "CreacionTienda\CreacionTienda.ssmssqlproj", "{E6DF465E-70DF-4601-B00A-E7DCEA3D5F45}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "GestionTienda", "GestionTienda\GestionTienda.ssmssqlproj", "{575B7D95-EED5-4DB7-B969-322F6CA65F70}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "TrabajoTienda", "TrabajoTienda\TrabajoTienda.ssmssqlproj", "{08C95AC7-3A2F-4167-9265-C77B32138819}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "Mantenimiento", "Mantenimiento\Mantenimiento.ssmssqlproj", "{2AE69D95-2144-462F-8F2A-D7B10787403E}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "TrabajoTienda2", "TrabajoTienda2\TrabajoTienda2.ssmssqlproj", "{A6F55297-3E0C-4DB5-8228-E534690C8636}"
+EndProject
+Project("{4F2E2C19-372F-40D8-9FA7-9D2138C6997A}") = "TrabajoTienda3 Varias Tablas", "TrabajoTienda3 Varias Tablas\TrabajoTienda3 Varias Tablas.ssmssqlproj", "{EC4CAAEF-4D71-459E-BC8D-54FC95E2E717}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Default = Default|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6DF465E-70DF-4601-B00A-E7DCEA3D5F45}.Default|Default.ActiveCfg = Default
+		{575B7D95-EED5-4DB7-B969-322F6CA65F70}.Default|Default.ActiveCfg = Default
+		{08C95AC7-3A2F-4167-9265-C77B32138819}.Default|Default.ActiveCfg = Default
+		{2AE69D95-2144-462F-8F2A-D7B10787403E}.Default|Default.ActiveCfg = Default
+		{A6F55297-3E0C-4DB5-8228-E534690C8636}.Default|Default.ActiveCfg = Default
+		{2B812294-919D-4BFE-9F8B-4A43618BEA78}.Default|Default.ActiveCfg = Default
+		{EC4CAAEF-4D71-459E-BC8D-54FC95E2E717}.Default|Default.ActiveCfg = Default
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4B495A25-BDD7-4CE9-8A83-ACC07C98F4DF}
+	EndGlobalSection
+EndGlobal
