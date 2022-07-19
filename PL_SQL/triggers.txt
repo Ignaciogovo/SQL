@@ -1,0 +1,19 @@
+CREATE OR REPLACE TRIGGER nombre_trigger
+AFTER/BEFORE INSERT/DELETE/UPDATE ON tabla
+FOR EACH ROW
+DELCARE
+	Variables
+BEGIN
+	codigo
+END;
+
+
+
+
+
+Obtener los datos nuevos: NEW.titulo, NEW.nombre etc...
+Obtener datos viejos: OLD.titulo, OLD.nombre etc...
+
+TABLA DUAL: Es una tabla propia de oracle, puedes sacar la fecha y el usuario 
+	USUARIO: SELECT USER INTO nombre_variable FROM DUAL;
+	FECHA: SELECT SYSDATE INTO fecha from DUAL;

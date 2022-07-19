@@ -1,0 +1,179 @@
+Vista que muestra el estado de la base de datos:
+	Select from * v$instance
+
+Comprobar si la base de datos esta abierta:
+	select status from v$instance
+
+Muestra los parametros generales de Oracle:
+	select * from v$system_parameter
+
+Muestra la versión de Oracle
+	select value from v$system_parameter where name = 'compatible'
+
+Conocer la ubicación y nombre del fichero spfile:
+	select value from v$system_parameter where name = 'spfile'
+
+Conocer la ubicación y número de ficheros de control:
+	select value from v$system_parameter where name = 'control_files'
+
+Conocer el nombre de la base de datos:
+	select value from v$system_parameter where name = 'db_name'
+
+Vista que muestra laas conexiones actuales a oracle: (agrupado por aplicación que realiza la conexión)
+   	select program Aplicacion, count(program) Numero_Sesiones
+	from v$session
+	group by program
+	order by Numero_Sesiones desc
+
+Muestra los usuarios conectados y el numero de sesiones por usuario:
+	select username Usuario_Oracle, count(username) Numero_Sesiones
+	from v$session
+	group by username
+	order by Numero_Sesiones desc
+
+Muestra propietarios de objetos y número de objetos por usuario
+	select owner, count(owner) Numero
+	from dba_objects
+	group by owner
+
+Muestra el diccionario de datos:(Incluye todas las vistas y tablas de la base de datos)
+	select * from dictionary
+
+Muestra los datos de una tabla especificada: (en este caso todas las tablas que lleven la cadena "XXX")
+	select * from ALL_ALL_TABLES where upper(table_name) like '%XXX%'
+
+Muestra las descripciones de los campos de una tabla especificada: (en este caso todas las tablas que lleven la cadena "XXX")
+	select * from ALL_COL_COMMENTS where upper(table_name) like '%XXX%'
+
+Muestra las tablas propiedad del usuario actual:
+	select * from user_tables
+
+Muestra los tablespaces, el espacio utilizado, el espacio libre y los ficheros de datos de los mismos:
+	Select t.tablespace_name "Tablespace", t.status "Estado",
+	ROUND(MAX(d.bytes)/1024/1024,2) "MB Tamaño",
+	ROUND((MAX(d.bytes)/1024/1024) -
+	(SUM(decode(f.bytes, NULL,0, f.bytes))/1024/1024),2) "MB Usados",
+	ROUND(SUM(decode(f.bytes, NULL,0, f.bytes))/1024/1024,2) "MB Libres",
+	t.pct_increase "% incremento",
+	SUBSTR(d.file_name,1,80) "Fichero de datos"
+	FROM DBA_FREE_SPACE f, DBA_DATA_FILES d, DBA_TABLESPACES t
+	WHERE t.tablespace_name = d.tablespace_name AND
+	f.tablespace_name(+) = d.tablespace_name
+	AND f.file_id(+) = d.file_id GROUP BY t.tablespace_name,
+	d.file_name, t.pct_increase, t.status ORDER BY 1,3 DESC
+
+Muestra los productos Oracle instalados y la version
+	select * from product_component_version
+
+Muestra los roles y privilegios por roles:
+	select * from role_sys_privs	
+
+Muestra las reglas de integridad y columna a la qur afectan:
+	select constraint_name, column_name from sys.all_cons_columns
+
+Muestra las tablas de las que es propietario un usuario, en este caso "xxx":
+	SELECT table_owner, table_name from sys.all_synonyms where table_owner like 'xxx'
+
+Muestra las tablas de las que es propietario un usuario de manera más efectiva:
+	SELECT DISTINCT TABLE_NAME
+	FROM ALL_ALL_TABLES
+	WHERE OWNER LIKE 'HR'
+
+Parámetros Oracle, valor actual y su descripción:
+	SELECT v.name, v.value value, decode(ISSYS_MODIFIABLE, 'DEFERRED',
+	'TRUE', 'FALSE') ISSYS_MODIFIABLE, decode(v.isDefault, 'TRUE', 'YES',
+	'FALSE', 'NO') "DEFAULT", DECODE(ISSES_MODIFIABLE, 'IMMEDIATE',
+	'YES','FALSE', 'NO', 'DEFERRED', 'NO', 'YES') SES_MODIFIABLE,
+	DECODE(ISSYS_MODIFIABLE, 'IMMEDIATE', 'YES', 'FALSE', 'NO',
+	'DEFERRED', 'YES','YES') SYS_MODIFIABLE , v.description
+	FROM V$PARAMETER v
+	WHERE name not like 'nls%' ORDER BY 1
+
+Muestra los usarios de oracle y sus datos:
+	Select * FROM dba_users
+
+Para conocer tablesespaces y propietarios de los mismos:
+	select owner, decode(partition_name, null, segment_name,
+	segment_name || ':' || partition_name) name,
+	segment_type, tablespace_name,bytes,initial_extent,
+	next_extent, PCT_INCREASE, extents, max_extents
+	from dba_segments
+	Where 1=1 And extents > 1 order by 9 desc, 3
+
+Últimas consultas ejecutadas y usuario que las ejecutó:
+	select distinct vs.sql_text, vs.sharable_mem,
+	vs.persistent_mem, vs.runtime_mem, vs.sorts,
+	vs.executions, vs.parse_calls, vs.module,
+	vs.buffer_gets, vs.disk_reads, vs.version_count,
+	vs.users_opening, vs.loads,
+	to_char(to_date(vs.first_load_time,
+	'YYYY-MM-DD/HH24:MI:SS'),'MM/DD HH24:MI:SS') first_load_time,
+	rawtohex(vs.address) address, vs.hash_value hash_value ,
+	rows_processed , vs.command_type, vs.parsing_user_id ,
+	OPTIMIZER_MODE , au.USERNAME parseuser
+	from v$sqlarea vs , all_users au
+	where (parsing_user_id != 0) AND
+	(au.user_id(+)=vs.parsing_user_id)
+	and (executions >= 1) order by buffer_gets/executions desc
+
+Conocer todos los tablespaces:
+	select * from V$TABLESPACE
+
+Memoria Share_Pool libre y usada
+	select name,to_number(value) bytes
+	from v$parameter where name ='shared_pool_size'
+	union all
+	select name,bytes
+	from v$sgastat where pool = 'shared pool' and name = 'free memory'
+
+Cursores abiertos por usuario:
+	select b.sid, a.username, b.value Cursores_Abiertos
+	from v$session a,
+	v$sesstat b,
+	v$statname c
+	where c.name in ('opened cursors current')
+	and b.statistic# = c.statistic#
+	and a.sid = b.sid
+	and a.username is not null
+	and b.value >0
+	order by 3
+
+Conocer los aciertos de la caché: (No debería superar el 1 por ciento)
+	select sum(pins) Ejecuciones, sum(reloads) Fallos_cache,
+	trunc(sum(reloads)/sum(pins)*100,2) Porcentaje_aciertos
+	from v$librarycache
+	where namespace in ('TABLE/PROCEDURE','SQL AREA','BODY','TRIGGER');
+
+Sentencias ejecutadas con un texto determinado:
+	SELECT c.sid, d.piece, c.serial#, c.username, d.sql_text
+	FROM v$session c, v$sqltext d
+	WHERE c.sql_hash_value = d.hash_value
+	and upper(d.sql_text) like '%WHERE CAMPO LIKE%'
+	ORDER BY c.sid, d.piece
+
+Sentencia concreta: (Filtrado por sid)
+	SELECT c.sid, d.piece, c.serial#, c.username, d.sql_text
+	FROM v$session c, v$sqltext d
+	WHERE c.sql_hash_value = d.hash_value
+	and upper(d.sql_text) like '%WHERE CAMPO LIKE%'
+	ORDER BY c.sid, d.piece
+
+Conocer el tamaño ocupado por la base de datos:
+	select sum(BYTES)/1024/1024 MB from DBA_EXTENTS
+
+Conocer el tamaño de los ficheros de datos de la base de datos:
+	select sum(bytes)/1024/1024 MB from dba_data_files
+
+conocer el tamaño ocupado por una tabla concreta sin incluir los indices de la misma:
+	select sum(bytes)/1024/1024 MB from user_segments
+	where segment_type='TABLE' and segment_name='NOMBRETABLA'
+
+
+conocer el tamaño ocupado por una tabla concreta junto con sus indices:
+	select sum(bytes)/1024/1024 Table_Allocation_MB from user_segments
+	where segment_type in ('TABLE','INDEX') and
+	(segment_name='NOMBRETABLA' or segment_name in
+	(select index_name from user_indexes where table_name='NOMBRETABLA'))
+
+Conocer el tamaño ocupado por una columna de una tabla:
+	select sum(vsize('NOMBRECOLUMNA'))/1024/1024 MB from NOMBRETABLA
