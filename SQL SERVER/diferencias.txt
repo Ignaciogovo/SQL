@@ -1,27 +1,34 @@
-MODIFY:
+1. MODIFY
+2. TRUNCATE
+3. REINICIAR IDENTITY(1,1)
+4. like
+5. Algunas select interesantes
+
+1. MODIFY:
  ALTER TABLE table_name
  ALTER COLUMN column_name column_type;
 
 
 
 
-Truncate table nombre_tabla;
+2. TRUNCATE
+	truncate table nombre_tabla;
 
 
-REINICIAR IDENTITY(1,1) 
+3. REINICIAR IDENTITY(1,1) 
 
-DBCC CHECKIDENT ( nombre_tabla, reseed,0)
+	DBCC CHECKIDENT ( nombre_tabla, reseed,0)
 
 
 
-like: 
+4. like: 
 	where nombre like '%extreme%' --> ambos lados
 	where nombre like 'e_treme' --> cualquier carecterer en la segunda posicion
 	where nombre like 'extreme [2,4]%'--> contengan el 2 y 4
 	where nombre like 'extreme [2-4]%'--> esten entre el 2 y el 4
 	where nombre like 'extreme [^2]%'--> no contengan el 2
 
-Algunas select interesantes:
+5. Algunas select interesantes:
 
 	select @@rowcount --> Muestra la cantidad de row que ha tenido el select anterior.
 
@@ -29,7 +36,7 @@ Algunas select interesantes:
 	select * from information_schema.tables --> Muestra las tablas y vistas que hay
 	select * from information_schema.columns --> muestra lo anterior más las columnas 
 
-	select select IDENT_CURRENT(nombre_tabla) --> Devuelve el último valor de identidad generado para una tabla o vista especificadas.
+	select IDENT_CURRENT('nombre_tabla') --> Devuelve el último valor de identidad generado para una tabla o vista especificadas.
 
 	exec sp_MSForeachTable 'Truncate table ?' --> Ejecutaria ese comando para todas las tablas de la base de datos.
 

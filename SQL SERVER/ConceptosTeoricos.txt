@@ -9,7 +9,7 @@
 	3.6 Backup tipos
 4 Tipos de replicacion
 5 Trasvase de registros
-
+6 SCHEMA
 
 
 1 Servicios:
@@ -139,6 +139,35 @@
 5 Trasvase de registros
 	 Permite enviar automáticamente copias de seguridad del registro de transacciones desde una base de datos principal de una instancia del servidor principal
 	 a una o varias bases de datos secundarias en instancias independientes del servidor secundario.
+
+
+
+
+6 SCHEMA
+	Un schema o esquema es un espacio de nombres de la base de datos. que nos permite agrupar los objetos.
+	El valor predeterminado de schema es dbo.
+
+	Echar un vistazo a los schemas que hay en una base de datos determinada:
+		use bbbdd
+		go
+		select * from sys.schemas
+
+	Echar un vistazo a los schemas y sus respectivas tablas de una base de datos determinada:
+		use bbbdd
+		go
+		select sc.name, o.name from sys.objects o
+		join sys.schemas sc on o.schema_id = sc.schema_id
+		where o.type = 'U'
+
+	CREAR UN SCHEMA:
+		use bbdd
+		go
+		CREATE SCHEMA EJEMPLOS
+	
+	Crear una tabla con su respectivo schema:
+		use bbdd
+		go
+		CREATE TABLE EJEMPLOS.Tabla1(...)
 
 
 
