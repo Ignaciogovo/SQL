@@ -20,7 +20,7 @@ Maestro:
 			psql
 
 		Creamos un usuario replciador en la base de datos
-			create user replica with replication encrypted password 'contraseña';
+			create user replica with replication encrypted password 'replica';
 		Incluimos en el archivo: /etc/postgresql/13/main/pg_hba.conf
 			nano /etc/postgresql/13/main/pg_hba.conf:
 				host      replication     replica      ipEsclavo        md5
@@ -45,5 +45,45 @@ Esclavo
 
 
 
+
+
+
+
 Comandos: https://www.postgresql.r2schools.com/how-to-setup-streaming-replication-in-postgresql-step-by-step-on-ubuntu/
 Video explicativo: https://www.youtube.com/watch?v=LhPAg583pKc&ab_channel=r2schools
+
+
+
+Otra opción: desde maestro:
+pg_basebackup -D basebackup -U replica -Fp -Xs -P -R
+
+
+
+
+
+pg_basebackup -U replica -R -D /var/lib/postgresql/data/ --
+host=postgres-db1-1
+
+
+
+
+pg_basebackup -D basebackup -U postgres -Fp -Xs -P -R
+cp -r basebackup data/basebackup
+
+
+
+test ! -f /var/lib/postgresql/archivelog/%f && cp %p /var/lib/postgresql/archivelog/%f
+
+
+
+
+
+
+
+
+ALTER USER postgres WITH PASSWORD 'postgres';
+
+
+
+
+

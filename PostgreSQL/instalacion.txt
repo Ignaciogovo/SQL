@@ -11,3 +11,65 @@ sudo -i -u postgres
 
 En debian 
 	su postgres
+	
+	
+	
+
+
+
+Instalación en centos 7 
+
+_
+Instalamos el paquete:
+	sudo yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+	
+Actualizamos paquetes:
+	 sudo yum update -y
+	 
+Instalamos postgres: ( distintas versiones: 9.6, 10, 11, 12, 13 y 14)
+	Según la version hay que cambiar xx por el numero
+	sudo yum -y install postgresqlxx-server
+
+
+Inicializamos archivos:
+	sudo /usr/pgsql-xx/bin/postgresql-xx-setup initdb
+
+Habilitamos servicio:
+	sudo systemctl enable postgresql-xx
+
+Iniciamos servicio
+	sudo systemctl start postgresql-xx
+
+
+conectarse al cliente:
+sudo -u postgres -i psql
+
+
+Comprobar version desde el cliente
+	postgres --version
+	
+	
+	
+Cómo crear un rol para tu usuario de CentOS
+	sudo -u postgres -i createuser --interactive
+	Ingrese el nombre del rol a agregar: usuario
+	¿Será el nuevo rol un superusuario? (s/n) s
+
+Ahora creamos la base de datos para este nuevo rol, que debe llevar el mismo nombre:
+	sudo -u postgres -i createdb usuario -O usuario
+	
+	
+	
+
+Acceder desde fuera:
+
+Para localizarlo:
+	sudo -u postgres psql -c 'SHOW config_file'
+
+Configuramos el archivo: nano /etc/postgresql/14/main/postgresql.conf
+	Modificamos la variable: listen_addresses = '*'
+
+
+	
+
+
