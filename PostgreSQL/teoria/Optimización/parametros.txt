@@ -1,0 +1,100 @@
+Optimización Postgres:
+
+
+Para encontrar o saber el valor del parametro podemos usar show en el cliente de postgresql
+
+	Conocer el fichero de configuración del servidor:
+		show config_file;
+		
+		
+	Otra forma de ver los parametros:
+		\d pg_settings
+		select * from pg_settings where name = 'nombre_parametro';
+		\x --> Usarlo antes para visualizarlo de una forma más cómoda.
+
+1 Modificar parametros del servidor:
+	Editamos postgresql.conf:
+		Ejemplo:
+			Número máximo de conexiones permitidas:
+				max_connections =
+			
+	Editamos con el comando alter system
+		Ejemplo:	
+			alter system set log_connection = 'on';
+			Reload desde psql:
+				pg_reload_conf();
+	
+	
+	Editar de forma temporal en una sesión con set session:
+		Ejemplo:
+			set session parametro = 'valor';
+			set session work_mem = '8MB';
+			
+	Resetear el valor de los parametros:
+		alter system reset parametro;
+		alter system reset all;
+	
+	
+	
+	
+	
+	
+
+
+
+SHARED_BUFFERS
+	-- El tamaño predeterminado es bastante bajo para que cualquier equipo pueda usarlo
+	-- Se recomienda cambiarlo al 25% de la memoria ram de tu equipo
+	-- Algunos dba asignan 16 veces el numero de conexiones maximas del servidor
+	show shared_buffers;
+	alter system set shared_buffers = 'valor';
+	reiniciar servidor --> systemctl restart postgresql
+	
+	
+
+WORK_MEM:
+	--> Valor predeterminado 4MB
+	--> Es el espacio en memoria ram que utilizan operaciones internas
+	-- Si necesita más del valor crea archivos temporales
+	-- Un valor adecuado para empezar se recomienda que sea de un 2% a un 4% en total
+	show work_mem;
+	alter system set work_mem='valor en (MB)';
+	show work_mem;
+	
+	Como saber que el parametro work_mem está bien ajustado: https://dbasinapuros.com/como-saber-si-esta-bien-ajustado-el-parametro-work_mem-de-postgresql/
+
+
+maintance_work_mem	
+	- Aumentar el valor de este parametro aumenta el rendimiento del vacuum
+	
+	Show maintance_work_mem;	
+
+
+checkpointer
+	Cuando ocurre este proceso todas las operaciones guardadas en share_buffers se guardan en disco. A continucación el share_buffers se limpia
+	
+		Parametros para configurar el checkpoint:
+			checkpoint_flush_after:
+				Por defecto: 256 KB
+				Una vez pasado por estos kb se produce el checkpoint. Estos kb indica el total de espacio de los bloques. Cada bloque son 8kb por lo tanto cuando se llenan 32 bloques se produce el checkpoint
+				
+				
+			checkpoint_timeout;
+				Por defecto 5min
+				
+				Cada x tiempo marcado se produce el checkpoint a menos que se llenen los bloques.
+	
+			checkpoint_completion_target
+				Indica el tiempo de duración de checkpoint
+				Por defecto 0.5
+				Si es mayor, 0.9 (por ejemplo) el tiempo de checkpoint será menor, pero los picos de entrada y salida serán menos agresivos
+				
+		
+bgwritter:
+
+
+
+Pagina que ayuda a configurar servidor: https://pgtune.leopard.in.ua/
+	
+	
+		

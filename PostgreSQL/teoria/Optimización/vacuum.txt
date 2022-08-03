@@ -1,0 +1,56 @@
+VACUUM.
+
+	Postgres No elimina un delete o un update, las marca como eliminadas.
+	Por lo tanto las tablas se agrandan.
+	VACUUM marca las filas como reutilizables y los nuevos inserts o updates ocupan el espacio de esas filas
+	Por defecto esta el autovacuum
+			-- Se produce periodicamente
+			-- Se puede configurar esa periocidad.  Por defecto es un minuto:	
+				show autovacuum_naptime;
+					set system
+				
+				show autovacuum_scale_facor --> Con este comando estamos preguntado cada cuanto espacio de la tabla se ejecuta el vacuum
+					Por defecto es 0.2 --> Cuando el 20% de los datos han sido modificados
+				
+				show autovacuum_vacuum_threshold;
+					Indica el minimo para Ejecutar autovacuum_scale_facor Por defecto son 50 filas
+	
+Ver tamaño de una tabla:
+	select pg_size_pretty(pg_relation_size('nombre_tabla'));
+
+Ver estadisticas de una tabla:
+	\x
+	select * from  pg_stat_user_tables;
+	
+Generar una tabla sin autovacuum:
+	create nombre_tabla (valores) with (autovacuum_enable = off);
+	
+Generar un vacuum sobre la tabla:
+	vacuum nombre_tabla;
+	
+Reducir el tamaño eliminando las filas marcadas:
+
+	VACUUM FULL --> Libera el espacio
+		--> Para hacer esta operación bloquea la tabla mientras se produce
+	vacuum full nombre_tabla;
+	
+
+Podemos configurar el parametro maintance_work_mem para mejorar la velocidad de vacuum
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+	
+	

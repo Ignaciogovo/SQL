@@ -1,0 +1,176 @@
+-- INFORMATION_SCHEMA
+
+LAS VISTAS SON LAS SIGUIENTES:
+
+1. CHECK_CONSTRAINTS
+2. COLUMN_DOMAIN_USAGE
+3. COLUMN_PRIVILEGES
+4. COLUMNS
+5. CONSTRAINT_COLUMN_USAGE
+6. CONSTRAINT_TABLE_USAGE
+7. DOMAIN_CONSTRAINTS
+8. DOMAINS
+9. KEY_COLUMN_USAGE
+10. PARAMETERS
+11. REFERENTIAL_CONSTRAINTS
+12. ROUTINES
+13. ROUTINE_COLUMNS
+14. SCHEMATA
+15. TABLE_CONSTRAINTS
+16. TABLE_PRIVILEGES
+17. TABLES
+18. VIEW_COLUMN_USAGE
+19. VIEW_TABLE_USAGE
+20. VIEWS
+
+
+1. CHECK_CONSTRAINTS
+	Presenta los constraints de una base de datos
+	Columnas:
+		CONSTRAINT_CATALOG	nvarchar(128)	Calificador de restricciones.
+		CONSTRAINT_SCHEMA	nvarchar(128)	Nombre del esquema al que pertenece la restricción.
+		CONSTRAINT_NAME	sysname	Nombre de restricción.
+		CHECK_CLAUSE	nvarchar(4000)	Texto real de la instrucción de definición de Transact-SQL.
+		
+		
+	Ejemplos:
+	SELECT * from INFORMATION_SCHEMA.CHECK_CONSTRAINTS
+		Resultado:
+		CONSTRAINT_CATALOG		CONSTRAINT_SCHEMA		CONSTRAINT_NAME						CHECK_CLAUSE
+			AdventureWord			Sales				CK_SalesOrderHeader_Freight      		([Freight]>=(0.00))
+			AdventureWord			HumanResources      CK_EmployeePayHistory_PayFrequency		([PayFrequency]=(2) OR [PayFrequency]=(1))
+
+
+
+2. COLUMN_DOMAIN_USAGE
+	Devuelve una fila para cada columna de la base de datos actual que tiene un tipo de datos de alias. Esta vista de esquema de información devuelve información sobre los objetos para los que el usuario actual tiene permisos.‎
+	Columnas:	
+		DOMAIN_CATALOG	nvarchar( 128 )	Base de datos en la que existe el tipo de datos de alias.
+		DOMAIN_SCHEMA	nvarchar( 128 )	Nombre del esquema que contiene el tipo de datos de alias.
+
+		DOMAIN_NAME	nombre del sistema	Tipo de datos de alias.
+		TABLE_CATALOG	nvarchar( 128 )	Calificador de mesa.
+		TABLE_SCHEMA	nvarchar( 128 )	Dueño de la mesa.
+
+		TABLE_NAME		Tabla en la que se utiliza el tipo de datos de alias.
+		COLUMN_NAME   Columna que utiliza el tipo de datos de alias.
+
+
+
+
+4. COLUMNS
+	Devuelve datos genericos de las columnas de una tabla
+	Columnas:
+		TABLE_CATALOG	nvarchar(128)	Clasificatorio de tabla.
+		TABLE_SCHEMA	nvarchar(128)	Nombre del esquema que contiene la tabla.
+		TABLE_NAME	nvarchar(128)	Nombre de la tabla.
+		COLUMN_NAME	nvarchar(128)	Nombre de la columna.
+		ORDINAL_POSITION	Int	Número de identificación de la columna.
+		COLUMN_DEFAULT	nvarchar(4000)	Valor predeterminado de la columna.
+		IS_NULLABLE	varchar(3)	Anulabilidad de la columna. Si esta columna permite NULL, esta columna devuelve SÍ. De lo contrario, se devuelve el NO.
+		DATA_TYPE	nvarchar(128)	Tipo de datos suministrado por el sistema.
+		CHARACTER_MAXIMUM_LENGTH	Int	Longitud máxima, en caracteres, para datos binarios, datos de caracteres o datos de texto e imagen.
+		CHARACTER_OCTET_LENGTH	Int	Longitud máxima, en bytes, para datos binarios, datos de caracteres o datos de texto e imagen.
+		NUMERIC_PRECISION	tinyint	Precisión de datos numéricos aproximados, datos numéricos exactos, datos enteros o datos monetarios. De lo contrario, se devuelve NULL.
+		NUMERIC_PRECISION_RADIX	smallint	Radio de precisión de datos numéricos aproximados, datos numéricos exactos, datos enteros o datos monetarios. De lo contrario, se devuelve NULL.
+		NUMERIC_SCALE	Int	Escala de datos numéricos aproximados, datos numéricos exactos, datos enteros o datos monetarios. De lo contrario, se devuelve NULL.
+		DATETIME_PRECISION	smallint	Código de subtipo para los tipos de datos datetime e intervalo ISO. Para otros tipos de datos, se devuelve NULL.
+		CHARACTER_SET_CATALOG	nvarchar(128)	Devuelve master. Esto indica la base de datos en la que se encuentra el juego de caracteres, si la columna es datos de caracteres o tipo de datos de texto. De lo contrario, se devuelve NULL.
+		CHARACTER_SET_SCHEMA	nvarchar(128)	Siempre devuelve NULL.
+		CHARACTER_SET_NAME	nvarchar(128)	Devuelve el nombre único del conjunto de caracteres si esta columna son datos de caracteres o tipos de datos de texto. De lo contrario, se devuelve NULL.
+		COLLATION_CATALOG	nvarchar(128)	Siempre devuelve NULL.
+		COLLATION_SCHEMA	nvarchar(128)	Siempre devuelve NULL.
+		COLLATION_NAME	nvarchar(128)	Devuelve el nombre único de la intercalación si la columna son datos de caracteres o tipos de datos de texto. De lo contrario, se devuelve NULL.
+		DOMAIN_CATALOG	nvarchar(128)	Si la columna es un tipo de datos de alias, esta columna es el nombre de la base de datos en la que se creó el tipo de datos definido por el usuario. De lo contrario, se devuelve NULL.
+		DOMAIN_SCHEMA	nvarchar(128)	Si la columna es un tipo de datos definido por el usuario, esta columna devuelve el nombre del esquema del tipo de datos definido por el usuario. De lo contrario, se devuelve NULL.
+		DOMAIN_NAME	nvarchar(128)	Si la columna es un tipo de datos definido por el usuario, esta columna es el nombre del tipo de datos definido por el usuario. De lo contrario, se devuelve NULL.
+
+
+	Ejemplos:
+	Seleccionar nombre de la tabla, columna y el id de la columna de una tabla especifica:
+		SELECT TABLE_NAME, COLUMN_NAME, COLUMNPROPERTY(OBJECT_ID(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'ColumnID') AS COLUMN_ID  
+		FROM INFORMATION_SCHEMA.COLUMNS  
+		WHERE TABLE_NAME = 'Nombre tabla';  
+		GO
+
+
+10. PARAMETERS
+	Devuelve una fila por cada parámetro de una función o procedimiento almacenado definido por el usuario
+	al que puede tener acceso el usuario actual de la base de datos actual.
+	
+	Columnas:
+		SPECIFIC_CATALOG	nvarchar( 128 )		Nombre del catálogo de la rutina de la cual éste es un parámetro.
+		SPECIFIC_SCHEMA		nvarchar( 128 )		Nombre del esquema de la rutina de la cual éste es un parámetro.
+		SPECIFIC_NAME		nvarchar( 128 )		Nombre de la rutina de la cual éste es un parámetro.
+		ORDINAL_POSITION	int					Posición ordinal del parámetro que empieza en 1. para el valor devuelto de una función, es un 0.
+		PARAMETER_MODE		nvarchar( 10 )		Devuelve IN si es un parámetro de entrada, OUT si es un parámetro de salida e INOUT si es un parámetro de entrada/salida.
+		IS_RESULT			nvarchar( 10 )		Devuelve YES si indica que el resultado de la rutina es una función. De lo contrario, devuelve NO.
+		AS_LOCATOR			nvarchar( 10 )		Devuelve YES si se ha declarado como localizador. De lo contrario, devuelve NO.
+		PARAMETER_NAME		nvarchar( 128 )		Nombre del parámetro. NULL si corresponde al valor devuelto de una función.
+		DATA_TYPE			nvarchar( 128 )		Tipo de datos proporcionado por el sistema.
+		CHARACTER_MAXIMUM_LENGTH 	int			Longitud máxima en caracteres de los tipos de datos binarios o de caracteres.
+		COLLATION_CATALOG	nvarchar( 128 )		Siempre devuelve NULL.
+		COLLATION_SCHEMA	nvarchar( 128 )		Siempre devuelve NULL.
+		COLLATION_NAME		nvarchar( 128 )		Nombre de la intercalación del parámetro. Si no es de uno de los tipos de carácter, devuelve NULL.
+		CHARACTER_SET_CATALOG  nvarchar( 128 )	Nombre del catálogo del juego de caracteres del parámetro. Si no es de uno de los tipos de carácter, devuelve NULL.
+		CHARACTER_SET_SCHEMA   nvarchar( 128 )	Siempre devuelve NULL.
+		CHARACTER_SET_NAME	nvarchar( 128 )		Nombre del juego de caracteres del parámetro. Si no es de uno de los tipos de carácter, devuelve NULL.
+		NUMERIC_PRECISION	tinyint				Precisión de los datos numéricos aproximados, datos numéricos exactos, datos enteros o datos monetarios. De lo contrario, devuelve NULL.
+		NUMERIC_PRECISION_RADIX	smallint		Base de la precisión de datos numéricos aproximados, datos numéricos exactos, datos enteros o datos monetarios. De lo contrario, devuelve NULL.
+		NUMERIC_SCALE		tinyint				Escala de datos numéricos aproximados, datos numéricos exactos, datos enteros o datos monetarios. De lo contrario, devuelve NULL.
+		DATETIME_PRECISION	smallint			Precisión en fracciones de segundo si el tipo de parámetro es datetime o smalldatetime. De lo contrario, devuelve NULL.
+		
+
+
+
+
+
+
+12. ROUTINES
+	Devuelve los procedures y funciones de una base de datos
+	
+	Consultas interesantes:
+		Consultar los procedures de una base de datos
+			select * from [INFORMATION_SCHEMA].[ROUTINES]
+			where routine_type='PROCEDURE'
+
+
+
+
+
+
+14. SCHEMATA
+	Devuelve todos los schemas de la base de datos actual
+	
+	Columnas:
+		CATALOG_NAME					sysname			Nombre de la base de datos actual
+		SCHEMA_NAME						nvarchar(128)	Devuelve el nombre del esquema.
+		SCHEMA_OWNER					nvarchar(128)	Nombre del propietario del esquema.
+		DEFAULT_CHARACTER_SET_CATALOG	varchar( 6 )	Siempre devuelve NULL.
+		DEFAULT_CHARACTER_SET_SCHEMA	varchar( 3 )	Siempre devuelve NULL.
+		DEFAULT_CHARACTER_SET_NAME		sysname			Devuelve el nombre del juego de caracteres predeterminado.
+
+
+15. TABLE_CONSTRAINTS
+	Devuelve todas las restricciones de la base de datos actual
+	
+	Columnas:
+		CONSTRAINT_CATALOG	nvarchar(128)	Calificador de la restricción.
+		CONSTRAINT_SCHEMA	nvarchar(128)	Nombre del esquema que contiene la restricción.
+		CONSTRAINT_NAME		sysname			Nombre de la restricción.
+		TABLE_CATALOG		nvarchar(128)	Calificador de tabla.
+		TABLE_SCHEMA		nvarchar(128)	Nombre de esquema que contiene la tabla.
+		TABLE_NAME			sysname			Nombre de la tabla.
+		CONSTRAINT_TYPE		varchar(11)		Tipo de restricción:CHECK,UNIQUE,PRIMARY KEY,FOREIGN KEY
+		IS_DEFERRABLE		varchar(2)		Especifica si la comprobación de la restricción se puede aplazar. Siempre devuelve NO.
+		INITIALLY_DEFERRED	varchar(2)		Especifica si la comprobación de la restricción se aplaza inicialmente. Siempre devuelve NO.
+
+
+17. TABLES
+	Devuelve todas las tablas de la base de datos actual
+	
+	Columnas:
+	TABLE_CATALOG	nvarchar( 128 )	Calificador de tabla.
+	TABLE_SCHEMA	nvarchar( 128 )	Nombre de esquema que contiene la tabla.
+	TABLE_NAME		sysname			Nombre de la tabla o vista.
+	TABLE_TYPE		varchar( 10 )	Tipo de tabla. Puede ser VIEW o BASE TABLE.
