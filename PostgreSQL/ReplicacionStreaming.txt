@@ -87,3 +87,4 @@ ALTER USER postgres WITH PASSWORD 'postgres';
 
 
 
+Probar con Citus para postgres como servicio de replicacion.

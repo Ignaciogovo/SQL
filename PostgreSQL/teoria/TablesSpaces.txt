@@ -20,3 +20,15 @@ Alter:
 DROP:
 
 	DROP TABLESPACE IF EXISTS nombre_tablespace;
+
+
+
+
+
+Listar los tablespaces
+	SELECT * FROM pg_tablespace;
+ 
+
+También puede utilizar el siguiente script para enumerar los objetos en el espacio de tabla.
+	select relname from pg_class
+	where reltablespace=(select oid from pg_tablespace where spcname='TABLESPACE_NAME');

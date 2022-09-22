@@ -1,0 +1,41 @@
+SCHEMAS:
+
+--Nombres de esquema que comienzan con pg_ están reservados para propósitos del sistema y no pueden ser creados por los usuarios.
+
+
+	Listar: 
+		- \dn
+		
+	Acceder a un objeto de un esquema concreto:
+		- select * from NombreEsquema.NombreObjeto ---> Ejemplo: select * from public.tabla1;
+		
+		
+	Crear esquema:
+		CREATE SCHEMA myschema;
+		
+		--> Crear un esquema a propiedad de otra persona:
+				CREATESCHEMA schema_name AUTHORIZATION user_name;
+		
+		
+	Eliminar esquema vacío:
+		DROP SCHEMA myschema;
+		
+	Eliminar esquema y todos sus objetos:
+		DROP SCHEMA myschema CASCADE;
+		
+
+
+	Cambiar de schema predeterminado en las consultas:
+		set search_path=esquema;
+	
+	Incluir varios esquemas en el comando \dt:
+		set search_path=esquema1,esquema2;
+	Cambiar una tabla de schema:
+		ALTER TABLE "public"."mitabla" 
+		SET SCHEMA "nuevoesquema";
+		
+	Para ver las tablas de un schema en concreto:
+		\dt nombre_schema.*
+
+Enlaces:
+sintaxis: https://foroayuda.es/esquemas-de-postgresql/

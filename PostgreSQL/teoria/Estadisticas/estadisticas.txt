@@ -1,0 +1,2 @@
+Vistas de estadisticas hechas por el sistema:
+\d pg_stat

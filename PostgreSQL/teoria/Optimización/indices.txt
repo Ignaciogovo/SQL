@@ -1,0 +1,81 @@
+Indices
+	Crear indice:
+		CREATE INDEX nombre_Indice on nombre_tabla(columna);
+		
+			Crear indice de covertura, con varios valores
+				CREATE INDEX nombre_Indice on nombre_tabla(columna) include (columna2);
+
+
+Foreign key:
+		
+	Lista de indices y tamaño:
+		\di+
+
+Para saber cuanto tiempo se tarda en hacer una consulta, previamente:
+ \timing
+ 
+ 
+Conocer el plan del select:
+	explain select * from ...
+ 
+ 
+ 
+ 
+ 
+ 
+ PRUEBAS: 
+	creacion tabla tasks:
+	create table tasks (
+	id_task serial primary key,
+	status text);
+ 
+	CREACION DE TABLA ITEMS:
+		create table items (
+		id_item serial, 
+		id_task int, 
+		task_order int, 
+		name text, 
+		constraint fk_items foreign key (id_task) references tasks (id_task) match simple on update cascade on delete cascade
+		);
+		
+		
+		Insertar valores:
+			WITH TASKS_rws as (
+			insert into tasks
+			select generate_series(501,100000),
+			case when (random() * 10) <6 then 'open'
+			when (random() * 10) >=6 then 'closed'
+			else 'sleep'
+			end
+			returning id_task)
+			insert into items
+			select generate_series(1,10),id_task,generate_series(1,10), 'Tarea número: ' || generate_series(1,10)
+			from TASKS_rws;
+		
+		
+Indices parciales
+CREATE INDEX nombre_Indice on nombre_tabla(columna) where columna = 'valor';
+
+
+
+
+
+
+
+Consulta para ver el valor y peso de los indices:
+SELECT nspname,
+       relname,
+       ROUND (100 * PG_RELATION_SIZE (indexrelid) / PG_RELATION_SIZE (indrelid)) / 100 AS index_ratio,
+       PG_SIZE_PRETTY (PG_RELATION_SIZE (indexrelid)) AS index_size,
+       PG_SIZE_PRETTY (PG_RELATION_SIZE (indrelid)) AS table_size
+  FROM pg_index i LEFT JOIN pg_class c ON (c.oid = i.indexrelid)
+                  LEFT JOIN pg_namespace n ON (c.oid = c.relnamespace)
+ WHERE nspname NOT IN ('pg_catalog','information_schema','pg_toast')
+   AND c.relkind = 'i'
+   AND PG_RELATION_SIZE (indrelid) > 0;
+   
+   
+Si el ratio de la consulta anterior es mayor que 1 significa que el indice está inchado. Por lo tanto se recomienda reorganizar el indice.
+	REINDEX nombre_Indice;
+
+ 

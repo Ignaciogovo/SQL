@@ -1,0 +1,12 @@
+# Esto permite obtener los resultados de una query en mucho menos tiempo gracias a la paralelización de la consulta.
+
+Si hacemos un explain analyze podemos encontrar cuantos trabajos en paralelo se esta produciendo:
+	        Workers Planned: 2
+			Workers Launched: 2
+			
+			
+Con este atributo conocemos el total de procesos paralelos:
+show max_parallel_workers_per_gather;
+
+modificar parametro:
+set session max_parallel_workers_per_gather = 4;

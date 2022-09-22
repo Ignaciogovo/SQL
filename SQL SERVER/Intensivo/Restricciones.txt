@@ -1,0 +1,24 @@
+Restricciones:
+
+
+	NOT NULL
+		--> No permite el valor null
+		Si se realiza un alter table para añadir esta restricción, se produce un error si hay valores nulos en la tabla
+			Hay que realizar un update para cambiarlos a:
+									UPDATE ConstraintDemo1 SET [Name]='' WHERE [Name] IS NULL
+			A continuación:
+									ALTER TABLE ConstraintDemo1 ALTER COLUMN [Name] VARCHAR(50) NOT NULL
+									
+									
+	
+	UNIQUE
+	
+	
+	
+	
+
+
+
+	
+	DELETE UPDATE CASCADE 
+	https://www.sqlshack.com/delete-cascade-and-update-cascade-in-sql-server-foreign-key/

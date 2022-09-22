@@ -1,0 +1,10 @@
+Recuperaciones de backups.
+	Mismo servidor:
+		Para realizar un backup hay que borrar todos los objetos existentes en la base de datos, por tanto:
+		Lo aconsejable --> pg_dumpall --clean > archivo.sql
+		
+	
+	Distinto servidor:
+		En el backup puede haber tablespace por lo tanto, habria que realizar una recuperación de un backup sin tablespace ya que no puede coincidir con el servidor
+			pg_dumpall --no-tablespaces > archivo.sql
+	

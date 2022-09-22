@@ -221,9 +221,9 @@ INSERT INTO detalle_ordenes VALUES(10,1,1,5);
 
 
 
-# prueba a posteriori:
-insert into categorias(categoriaid,nombrecat) values(800,'DEPORTE');
+-- prueba a posteriori:
+-- insert into categorias(categoriaid,nombrecat) values(800,'DEPORTE');
 
 
-create table test(int serial);
-insert into test(select generate_series(1,500));
+-- create table test(int serial);
+-- insert into test(select generate_series(1,500));

@@ -14,6 +14,7 @@
 	6.2 Oracle
 	6.3 Sql Server:
 7 Comando SHOW
+8 Campos Calculados
 
 1 Crear una tabla
 
@@ -200,9 +201,22 @@
 
 
 
+8 Campos Calculados
+	Campos a partir de otros campos de la misma tabla
+	Ejemplo:
+		Create table OrdenDetalle
+		(
+			OrdenDetalleId int not null primary key,
+			ordenId int not null,
+			ProductoId int not null,
+			Precio decimal(7,2),
+			cantidad int,
+---> Campo calculado	Parcial as Precio * cantidad PERSISTED
+		)
+		GO
 
-
-
+	Añadir PERSISTED:
+		Con esta función el dato se queda guardado en la tabla, por lo que no actua como vista(Consumiendo mas memoria pero menos ram y procesador en las consultas)
 
 documentacion: https://www.1keydata.com/es/sql/sql-trim.php
 Permisos mysql: https://dam.org.es/permisos-en-mysql/

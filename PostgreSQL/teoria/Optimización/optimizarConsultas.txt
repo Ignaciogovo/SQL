@@ -1,0 +1,56 @@
+Optimización de consultas
+
+Con el comando explain nos permite analizar las consultas
+
+	- explain select * from ...
+	
+	- Ademas podemos usar:
+		explain analyze select * from ... para estar más completo
+		
+		
+-- Costes de ejecución
+
+show seq_page_cost; el coste de una página tiene el coste de uno
+
+show random_page_cost; el coste de encontrar una página random
+show cp_tuple_cost; El coste de encontrar una tupla --> 0.0.1
+show cp_index_tuple_cost; Coste del indice de una tupla
+show cpu_operator_cost; Coste de una operación del cpu
+
+
+----Unificar consultas:
+
+
+	En vez de uniones:
+		explain analyze
+		select count(*) from tasks where id_task <=1000
+		union
+		select count(*) from tasks where id_task >1000 and id_task <=10000
+		union
+		select count(*) from tasks where id_task >10000
+		;
+	
+	Usar case:
+		explain analyze
+		select count(case when id_task <=1000 then 1 else null end),
+			   count(case when  id_task >1000 and id_task <=10000 then 1 else null end),
+			   count(case when id_task >10000 then 1 else null end) from tasks;
+	   
+	   
+	   
+
+
+	Join: explain analyze select * from t1 join (t2 join t3 on id2=id3) on id1=id3;
+	explain analyze select * from t1 join t2  on t1.id1 = t2.id2 join t3 on t3.id3 = t2.id2;
+	
+		show join_collapse_limit; Muestra la cantidad de consultas que se estudian en el planificador del join para escoger la opción mas economica
+		Para limitar el tiempo de planificacion:
+			1-> Realizamos el explain analyze de la consulta con los join
+			2-> En los datos ofrecidos: Materialize->Merge join->merge cond
+			3-> Una vez encontrado la forma más economica limitamos el join_collapse_limit: set session join_collapse_limit = 1;
+			4-> Ejecutamos la consulta más óptima: --> explain analyze select * from t1 join t2  on t1.id1 = t2.id2 join t3 on t3.id3 = t2.id2;
+
+			
+
+	DISTINCT:
+		El distinct aumenta bastante el tiempo de ejecución de una consulta

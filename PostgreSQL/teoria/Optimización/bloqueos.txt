@@ -1,0 +1,38 @@
+Tipos de bloqueos:
+		BLOQUEO					USADO EN						CAUSA PROBLEMAS CON
+	-- ACCESS SHARE  		--> select sobre una tabla		-->	Ninguno
+	-- ROW SHARE			--> SELECT sobre una tabla		--> Bloqueos Exclusive
+	-- ROW EXCLUSVE			--> INSERT/UPDATE/DELETE		--> Bloqueos exclusive + SHARE
+	-- SHARE UPDATE EXCLUSVE -->VACUUM/ANALYZE/CREATE INDEX --> Bloqueos exclusive + share
+	-- SHARE				--> CREATE/UPDATE INDEX			--> Bloqueos exclusive
+	-- SHARE ROW EXCLUSVE	--> Lanzado manualmente			--> Bloqueos exclusive + share
+	-- EXCLUSVE				--> Lanzado manualmente 		--> Con todos menos access share
+	-- ACCESS EXCLUSVE		--> ALTER TABLE/VACUUMFULL/REINDEX --> Con todos
+	
+	
+	
+	
+	
+	
+	
+	
+	
+-- Consulta para saber que procesos estan bloqueando	
+	SELECT l.pid AS "PID",
+		   l.client_addr AS "IP",
+		   l.query AS "Query"
+	  FROM pg_stat_activity w JOIN pg_locks l1 ON w.pid = l1.pid AND NOT l1.granted
+							  JOIN pg_locks l2 ON l1.relation = l2.relation AND l2.granted
+							  JOIN pg_stat_activity l ON l2.pid = l.pid;
+
+
+
+Para ver la actividad del servidor de postgres:
+	sudo apt install pg_activity
+	
+
+A continuación eliminamos el proceso de provoque el bloqueo.
+	
+	
+	
+Analizador de log: https://www.todopostgresql.com/pgbadger/

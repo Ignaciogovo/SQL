@@ -1,0 +1,41 @@
+pg_dumpall
+	pg_dumpall > /ruta/archivo.sql
+	
+	OPCIONES:
+		-c --clean  --> Borra las bases de datos antes de crearlas. Tambien hace lo mismo con los tablespaces y roles
+		--if-exists --> Usa IF EXISTS antesde borrar objetos
+		
+		-a, --data-only --> backup de solamente los datos. No se puede restaurar este backup en ya que solo almacena los datos.
+				--disable-triggers --> deshabilita los triggers durante la restauración de un backup solo de datos
+		-s, --schema-only --> Backup solamente de la estructura, Ningún dato.
+		-g, --global-only  --> Hace un backup de objetos globales, tablespaces y roles
+		-r, --roles-only --> Backup solamente de los roles
+		-t, --tablespaces-only --> Backup solamente tablespaces
+		
+		--no-tablespaces --> Backup sin tablespaces
+		
+		-E, --enconding = ENCODING --> Ejemplo: -E LATIN1 Indica el formato que queremos usar
+		
+		--no-comments --> No añade comentarios
+		
+		-x, --no-privileges --> Quita los privilegios
+		--no-role-passwords --> No incluye en el backup las contraseñas de los roles
+		--exclude-database=Nombre-Database	--> excluye las base de datos nombradas
+		
+		--binary-upgrade --> Usado para actualizaciones de postgres
+		
+		--inserts --> sustituye sentencias copy por inserts;
+		--column-inserts--> Sustituye sentencias copy por inserts incluyendo las columnas;
+		--rows-per-insert=NROWS --> Indica el número de cada filas por insert
+		--on-conflict-do-nothing --> Si hay un conflito en el insert anula el insert
+		
+		--quote-all-identifiers --> Introduce comillas en el nombre de las tablas, roles, etc. De forma predeterminada no viene incluido.
+		
+		--load-via-partition-root --> Cargar particiones desde la tabla root
+		
+		-W, --password --> Fuerza la petición de contraseña para realizar el backup
+		-w, --no-password --> 
+		
+		Backups en servidor remoto:
+			-h, --host=HOSTNAME
+			-p, --port=PORT
