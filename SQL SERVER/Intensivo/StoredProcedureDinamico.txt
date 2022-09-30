@@ -1,0 +1,55 @@
+	Procedure: 	EXEC SP_EXECUTESQL @SCRIPT; --->Ejecutar una cadena de texto como codigo sql.
+Ejemplo:
+
+	Según el dato ofrecido al procedure la consulta sera ordenada:
+		- N --> ordenada por el nombre
+		- C --> ordenada por el Codigo postal
+		- T --> ordenada por el telefono
+		
+	CREATE OR ALTER PROCEDURE SP_OrderClientes(@orden char(1))
+	AS
+	DECLARE @SCRIPT NVARCHAR (4000)
+	DECLARE @ORDERBY NVARCHAR(400)
+	SET @SCRIPT = 'SELECT * FROM CLIENTES '
+	SET @ORDERBY = ( CASE WHEN @orden = 'N' THEN 'ORDER BY Nombre'
+							WHEN @orden = 'C' THEN 'ORDER BY Cod_Postal'
+							WHEN @orden = 'T' THEN 'ORDER BY Telefono'
+							else ''
+							end)
+	set @SCRIPT = @SCRIPT + @ORDERBY
+
+	EXEC SP_EXECUTESQL @SCRIPT;
+	go
+
+	exec SP_OrderClientes 'C'
+	
+	
+	
+	
+OUTPUT PARA devolver datos de un procedure
+
+
+
+
+	CREATE OR ALTER PROCEDURE SP_OrderClientes
+		(
+		@orden char(1),
+-->		@out varchar(MAX) OUTPUT
+		)
+	AS
+	DECLARE @SCRIPT NVARCHAR (4000)
+	DECLARE @ORDERBY NVARCHAR(400)
+	SET @SCRIPT = 'SELECT * FROM CLIENTES '
+	SET @ORDERBY = ( CASE WHEN @orden = 'N' THEN 'ORDER BY Nombre'
+							WHEN @orden = 'C' THEN 'ORDER BY Cod_Postal'
+							WHEN @orden = 'T' THEN 'ORDER BY Telefono'
+							else ''
+							end)
+-->	set @out= @SCRIPT + @ORDERBY;
+	go
+
+
+DECLARE @consulta nvarchar(MAX);
+
+exec SP_OrderClientes 'C', @consulta OUTPUT;
+print @consulta;

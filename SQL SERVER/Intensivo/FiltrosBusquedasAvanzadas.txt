@@ -1,0 +1,52 @@
+1 USO LEFT JOIN con ISNULL
+2 Concatenar varias filas en una
+3 USO DE CASE EN WHERE
+4 Producto cartesiano/ cross join
+
+
+1 USO LEFT JOIN con ISNULL
+	Para indicar los valores nulos del left join hay dos formas en el where:
+		1-> where isnull(columna,'') = ''   --> Convierte los valores nulos en una cadena vacía
+		2-> where columna is null
+
+
+
+2 Concatenar varias filas en una
+	Primer y segundo paso --> generas la subconsulta:     	(FOR XML PATH permite indicar como separar los valores)
+		select ', '+ convert(varchar(50),id) from Ingredientes where Nombre= i.nombre
+		FOR XML PATH ('')
+	
+	Tercer paso, quitar la coma inicial junto la consulta final:
+	Usamos la función stuff(cadena, inicio, longitud, remplazo) --> Se utiliza para cambiar valores de una cadena	
+			De tal forma que stuff(subconsulta,1,2,'')
+	Consulta	
+		select count(*) as repetidos,Nombre, stuff(
+			(
+				select ', '+ convert(varchar(50),id) 
+				from Ingredientes 
+				where Nombre= i.nombre 
+				order by id desc
+				FOR XML PATH ('')
+			),1,2,'')as Tid 
+			from Ingredientes as i 
+		group by Nombre 
+		order by repetidos desc
+
+
+	https://www.campusmvp.es/recursos/post/como-concatenar-subconsultas-en-un-solo-campo-con-sql-server.aspx
+	
+	
+
+3 USO DE CASE EN WHERE
+	Ejemplo:
+	DECLARE @nombre varchar(30) = NULL
+	
+	SELECT * FROM tabla
+		where name = (CASE WHEN isnull(@nombre,'')<>'' THEN @nombre
+							ELSE name
+							end)
+
+
+
+4 Producto cartesiano/ cross join
+	http://deletesql.com/viewtopic.php?f=5&t=18

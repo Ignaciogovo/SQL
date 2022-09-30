@@ -1,0 +1,45 @@
+1 Insert select
+2 UPDATE INNER JOIN
+3 DELETE INNER JOIN
+4 SELECT INTO
+5 Clon de la base de datos
+
+
+1 Insert select
+
+	insert into tabla
+		select * from otratabla
+	
+
+2 UPDATE INNER JOIN
+
+	UPDATE tabla set columna= valor 
+	from tabla t inner join otratabla o
+	on t.id=o.id
+	where o.columna2= valor
+	
+3 DELETE INNER JOIN		--> Borra los datos que coincidan con los datos establecidos con inner join de las tablas mencionadas en el inner join¿?
+	DELETE t	
+	from tabla t inner join otratabla o
+	on t.id=o.id
+	where o.columna2= valor
+
+4 SELECT INTO ---> Genera una nueva tabla a partir de un select. No copia PK ni indices.
+	SELECT * INTO nuevatabla
+	from tabla
+	where condicion
+	
+	
+			Crear tablas en un momento con  una estructura determinada sin datos:
+									SELECT * INTO nuevatabla
+									from tabla
+									where 1=0
+		
+			Crear tablas con indenty:
+				select identity(int,1,1) as id, * into nombre_tablaNueva
+				from tabla
+				
+
+5 Clon de la base de datos
+	DBCC CLONEDATABASE(databasename, newdatabasename)
+		Puede dar problemas

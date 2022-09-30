@@ -1,0 +1,93 @@
+1 Realizar un insert con un cursor 
+2 Cursor actualizando la tabla utilizada como bucle:
+
+
+
+			1 Realizar un insert con un cursor 
+Use AdventureWorks
+GO
+	--Creamos una tabla:
+create table humanresources.EmployeeList(
+NationalIDNumber varchar(10),
+jobtitle varchar(100)
+)
+
+
+	-- DECLARO LAS VARIABLES DONDE ALMACENARÁ CADA ITERACIÓN:
+
+DECLARE @NationalIDNumber varchar(10), @JobTitle varchar(100)
+
+	-- Declaramos el cursor
+declare micursor cursor fast_forward for --> Fast_forward convierte el cursor en solo lectura, mas rapido pero no puede hacer cambios en la tabla del cursor
+select NationalIDNumber,JobTitle from humanresources.Employee where gender = 'M'
+
+	--Abrimos Cursor
+OPEN micursor
+
+
+	-- LEO EL PRIMER REGISTRO Y ALMACENO LOS CAMPOS  EN LAS VARIABLES
+FETCH NEXT FROM micursor
+INTO @NationalIDNumber,@JobTitle
+
+
+	--Generamos un bucle
+while @@FETCH_STATUS = 0 -- Cuando fecha status es distinto de 0 indica que el cursor ha llegado al final
+BEGIN
+		-- INSERT EN LA TABLA EmployeeList
+	insert into HumanResources.EmployeeList VALUES(@NationalIDNumber,@JobTitle)
+	--Pasamos al siguiente registro
+	fetch next from micursor
+	INTO @NationalIDNumber,@JobTitle
+END
+
+	-- Cerramos y eliminamos cursor
+CLOSE micursor
+DEALLOCATE micursor
+
+	--Comprobamos con un select
+select  * from HumanResources.EmployeeList
+
+
+
+
+
+
+			2 Cursor actualizando la tabla utilizada como bucle:
+
+
+Use AdventureWorks
+GO
+	-- DECLARO LAS VARIABLES DONDE ALMACENARÁ CADA ITERACIÓN:
+
+DECLARE @NationalIDNumber varchar(10), @JobTitle varchar(100)
+
+
+	--Declaramos el cursor eliminando la caracteristica fast_forward para realizar el update
+declare micursor cursor  for
+select NationalIDNumber,JobTitle from humanresources.Employee where gender = 'M'
+
+	-- Abrimos  cursor
+OPEN micursor
+
+
+	-- LEO EL PRIMER REGISTRO Y ALMACENO LOS CAMPOS  EN LAS VARIABLES
+FETCH NEXT FROM micursor
+INTO @NationalIDNumber,@JobTitle
+
+while @@FETCH_STATUS = 0 -- Cuando fecha status es distinto de 0 indica que el cursor ha llegado al final
+BEGIN
+		-- INSERT EN LA TABLA EmployeeList
+	insert into HumanResources.EmployeeList VALUES(@NationalIDNumber,@JobTitle)
+
+		--Actualizamos los datos de la tabla del cursor
+	update HumanResources.Employee set CurrentFlag = 0
+	where current of micursor
+
+		--Pasamos al siguiente registro
+	fetch next from micursor
+	INTO @NationalIDNumber,@JobTitle
+END
+	-- Cerramos y eliminamos cursor
+
+CLOSE micursor
+DEALLOCATE micursor

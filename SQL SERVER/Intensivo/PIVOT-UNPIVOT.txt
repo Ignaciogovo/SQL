@@ -1,0 +1,103 @@
+1 OPERADOR PIVOT
+2 OPERADOR UNPIVOT
+3 Alternativa de consulta
+4 Comparación de las consultas con sqlqueryStress
+
+1 OPERADOR PIVOT
+
+	-- Creamos una tabla temporal
+with ventasPorcategoria as(
+select  distinct DATEPART(year,SOH.OrderDate) AS AÑO, pc.[Name] as categoria,
+p.ProductID
+from Sales.SalesOrderHeader SOH
+INNER JOIN Sales.SalesOrderDetail SOD
+ON SOH.SalesOrderID=SOD.SalesOrderID
+inner join Production.Product P
+on SOD.ProductID=p.ProductID
+inner join Production.ProductSubcategory PS
+on P.ProductSubcategoryID = PS.ProductSubcategoryID
+INNER JOIN Production.ProductCategory PC
+on PS.ProductCategoryID= pc.ProductCategoryID
+)
+	-- Aplicamos pivot
+
+select * from ventasPorcategoria
+pivot(count(productID) FOR AÑO in([2014],[2013],[2012],[2011])) as pivotTable
+
+
+
+
+
+2 OPERADOR UNPIVOT 
+	-Revierte 
+	
+	
+	
+-- Creamos una tabla temporal
+with ventasPorcategoria as(
+select  distinct DATEPART(year,SOH.OrderDate) AS AÑO, pc.[Name] as categoria,
+p.ProductID
+from Sales.SalesOrderHeader SOH
+INNER JOIN Sales.SalesOrderDetail SOD
+ON SOH.SalesOrderID=SOD.SalesOrderID
+inner join Production.Product P
+on SOD.ProductID=p.ProductID
+inner join Production.ProductSubcategory PS
+on P.ProductSubcategoryID = PS.ProductSubcategoryID
+INNER JOIN Production.ProductCategory PC
+on PS.ProductCategoryID= pc.ProductCategoryID
+)
+-- Aplicamos pivot
+
+select * from ventasPorcategoria
+pivot(count(productID) FOR AÑO in([2014],[2013],[2012],[2011])) as pivotTable
+
+UNPIVOT (productID FOR AÑO IN([2014],[2013],[2012],[2011])) AS UNPITVOTABLE
+
+go
+
+
+
+
+
+
+
+
+	--3 Alternativa de consulta
+
+LLegar a la misma solución que unpivot anterior:
+select categoria,count(total) as total,AnO as año from  
+
+(
+select  distinct DATEPART(year,SOH.OrderDate) AS AnO, pc.[Name] as categoria,
+p.ProductID as total
+from Sales.SalesOrderHeader SOH
+INNER JOIN Sales.SalesOrderDetail SOD
+ON SOH.SalesOrderID=SOD.SalesOrderID
+inner join Production.Product P
+on SOD.ProductID=p.ProductID
+inner join Production.ProductSubcategory PS
+on P.ProductSubcategoryID = PS.ProductSubcategoryID
+INNER JOIN Production.ProductCategory PC
+on PS.ProductCategoryID= pc.ProductCategoryID
+
+
+) as otro
+group by otro.AnO,otro.categoria
+order by categoria,AnO desc,Total desc
+
+
+
+
+	-- 4 Comparación de las consultas con sqlqueryStress
+
+
+Iteracciones: 11
+numero de hilos 11
+
+consulta con unpivot: 14.8044
+
+
+Consulta a partir de una subconsulta: 34.1982
+
+Como podemos ver la consulta a partir de unpivot es más rápida
