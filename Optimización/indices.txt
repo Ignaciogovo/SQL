@@ -19,3 +19,57 @@ DROP INDEX nombre_indice ON nombre_tabla
 Para ver cuanto ocupa una tabla en el disco:
 exec sp_spaceused 'nombre_tabla'
 		
+
+
+--- Coste oculto de los indices:
+-> En escrituras: el motor debe actualizar los indices haciendo más trabajo
+-> En espacio: Un indice puede llegar a ocupar como una tabla
+-> En el query optimizer: demasiados indices pueden confundir al optimizador y usar un plan subóptimo.
+
+
+
+-- Cuando si poner un índice: 
+Beneficia en los siguientes casos:
+	-- La columna aparece en where, join, order by
+	-- La tabla tiene más de 10k filas
+	-- alta cardinalidad ( >= 10%distintos) ( Evaluación con cuidado)
+	-- La tabla es mayormente de lectura
+
+
+
+-- Tipos de indices:
+	SQL SERVER:
+		-- Cada tabla un clustered Index. 
+
+
+	MySQL: 
+		-- Cada tabla tiene un Primary key index ( funciona igual que el clustered index) 
+		
+
+	Non-clustered index:
+		-- Indices secundarios. Contienen la clave de la búsqueda y un puntero a la fila real( PK)
+
+		-- El índice más típico: acelerar búsquedas por ClienteID
+			CREATE NONCLUSTERED INDEX IX_Pedidos_ClienteID
+    			ON Pedidos(ClienteID);
+
+		-- En MySQL la sintaxis es la misma pero sin NONCLUSTERED (es implícito)
+			CREATE INDEX IX_Pedidos_ClienteID ON Pedidos(ClienteID);
+
+	Unique Index
+		-- Garantiza unicidad + obtimiza búsquedas. Úsalo en columnas que debe ser únicas per no son PK.
+
+	Filtered Index ( SQL server) 
+		-- Índices que sólo incluyen subconjunto de filas:
+	
+		-- SQL Server: índice sólo sobre pedidos activos
+		-- Si el 90% están "completados", este índice es 10x más pequeño
+		CREATE NONCLUSTERED INDEX IX_Pedidos_Activos
+	    	ON Pedidos(ClienteID, FechaPedido)
+	    	WHERE Estado = 'activo';
+
+		-- MySQL: no tiene Filtered Index. Se simula con columnas generadas:
+		ALTER TABLE Pedidos ADD ClienteActivo INT AS (
+	    	CASE WHEN Estado = 'activo' THEN ClienteID ELSE NULL END
+		) STORED;
+CREATE INDEX IX_Pedidos_ClienteActivo ON Pedidos(ClienteActivo);

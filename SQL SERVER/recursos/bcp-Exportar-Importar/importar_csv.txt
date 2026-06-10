@@ -1,0 +1,35 @@
+BULK INSERT personas
+FROM 'C:\Users\Usuario\Documentos\datos.csv'
+WITH
+(
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2 -- Omitir la primera fila (encabezados)
+);
+
+
+
+
+
+
+BULK INSERT personas
+FROM 'C:\Users\Usuario\Documentos\datos.csv'
+WITH
+(
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2, -- Omitir la primera fila (encabezados)
+    KEEPIDENTITY,
+    TABLOCK,
+    ERRORFILE = 'C:\Users\Usuario\Documentos\datos_error.csv', -- Archivo de errores
+    DATAFILETYPE = 'char', -- Tipo de archivo
+    FORMATFILE = 'C:\Users\Usuario\Documentos\datos.fmt' -- Archivo de formato
+);
+En este ejemplo, la opción "KEEPIDENTITY" le indica a SQL Server que mantenga los valores 
+de identity de la columna "id" en la tabla. 
+La opción "TABLOCK" le indica a SQL Server que bloquee la tabla 
+durante la inserción de datos. El argumento "ERRORFILE" especifica la ubicación y el nombre del archivo 
+donde se guardarán los errores, si los hay.
+La opción "DATAFILETYPE" especifica el tipo de archivo que se está importando.
+ La opción "FORMATFILE" especifica la ubicación y el nombre del archivo de formato,
+  que es un archivo XML que describe la estructura de los datos en el archivo CSV.
