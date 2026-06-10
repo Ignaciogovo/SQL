@@ -6,7 +6,7 @@
 	1.5 Between
 	1.6 IN
 	1.7 LIMIT y OFFSET
-	1.8 CASE
+	1.8 CASE/WHEN
 2 SubConsultas
 	2.1 Subconsulta en el select
 	2.2 Subconsulta en la condicion
