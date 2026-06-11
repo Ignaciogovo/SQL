@@ -72,4 +72,106 @@ Beneficia en los siguientes casos:
 		ALTER TABLE Pedidos ADD ClienteActivo INT AS (
 	    	CASE WHEN Estado = 'activo' THEN ClienteID ELSE NULL END
 		) STORED;
-CREATE INDEX IX_Pedidos_ClienteActivo ON Pedidos(ClienteActivo);
+		CREATE INDEX IX_Pedidos_ClienteActivo ON Pedidos(ClienteActivo);
+
+
+	Covering Index
+		-- Todas las columnas son cubiertas por el indice:
+	
+			-- Query frecuente: listado de pedidos por cliente con fecha y total
+			SELECT FechaPedido, Total FROM Pedidos WHERE ClienteID = 123;
+
+			-- Sin covering index: index seek en ClienteID, luego key lookup para FechaPedido/Total
+			-- Con covering index: 0 accesos a la tabla
+			CREATE NONCLUSTERED INDEX IX_Pedidos_Cliente_Covering
+			    ON Pedidos(ClienteID)
+			    INCLUDE (FechaPedido, Total);  -- SQL Server: columnas NO clave en las hojas ( El include solo se almacenan las columnas, no sirven para ordenar ni buscar, por lo que son más compactos)
+
+			-- MySQL: incluye las columnas en la clave del índice (menos elegante)
+			CREATE INDEX IX_Pedidos_Cliente_Covering
+			    ON Pedidos(ClienteID, FechaPedido, Total);
+
+
+
+	Composite Index
+		-- EL orden importa, si está compuesto por (A, B, C)  Debe seguir ese orden:
+		CREATE INDEX IX ON Pedidos(ClienteID, FechaPedido, Estado)
+		
+		¿Qué queries usan este índice?
+		✓ Usa índice WHERE ClienteID = 5
+		✓ Usa índice WHERE ClienteID = 5 AND FechaPedido > '2024-01-01'
+		✓ Usa índice WHERE ClienteID = 5 AND FechaPedido = '2024-01-01' AND Estado = 'activo'
+		✗ NO usa índice WHERE FechaPedido = '2024-01-01' (falta prefijo)
+		✗ NO usa índice WHERE Estado = 'activo'(falta prefijo)
+		⚠ Parcial WHERE ClienteID = 5 AND Estado = 'activo' (salta FechaPedido → solo filtra por ClienteID)
+
+
+
+		La regla: columna más selectiva primero
+		✗ Mal orden
+		CREATE INDEX IX ON Ventas(
+		  Pais,      -- 5 valores
+		  Año,       -- 5 valores
+		  VendedorID -- 10,000 valores
+		)
+		El árbol se divide en bloques enormes antes de llegar al valor que realmente filtra
+		✓ Buen orden
+		CREATE INDEX IX ON Ventas(
+		  VendedorID, -- 10,000 valores
+		  Año,        -- 5 valores
+		  Pais        -- 5 valores
+		)
+		Filtra agresivamente desde el primer nivel del árbol
+		Excepción: igualdad antes que rango
+
+		Si mezclas = con BETWEEN o >, pon las columnas de igualdad primero aunque tengan menos cardinalidad.
+		-- Query: WHERE Estado = 'activo' AND Fecha BETWEEN '2024-01-01' AND '2024-12-31'
+		-- CORRECTO: (Estado, Fecha)   → seek exacto en Estado, luego scan de rango en Fecha
+		-- MAL:      (Fecha, Estado)   → scan de rango en Fecha (enorme), luego filtro residual
+
+
+	Operaciones que anulan a los índices
+		-- ❌ FUNCIONES sobre la columna indexada → full table scan
+		WHERE YEAR(FechaPedido) = 2024          -- MySQL y SQL Server: rompe el índice
+		WHERE UPPER(Email) = 'JUAN@EMAIL.COM'   -- lo mismo
+
+		-- ✅ Solución: mover la función al lado del literal
+		WHERE FechaPedido >= '2024-01-01' AND FechaPedido < '2025-01-01'
+		WHERE Email = LOWER('JUAN@EMAIL.COM')   -- o guardar el email en minúsculas
+
+		-- ❌ CONVERSIONES IMPLÍCITAS de tipo → full scan silencioso
+		-- Si ClienteID es INT pero pasas un string:
+		WHERE ClienteID = '1234'  -- SQL Server convierte cada fila, no usa índice
+
+		-- ❌ LIKE con wildcard al inicio
+		WHERE Nombre LIKE '%García'    -- full scan, no puede usar el B-Tree
+		WHERE Nombre LIKE 'García%'    -- ✅ SÍ usa el índice (prefijo fijo)
+
+		-- ❌ OR entre columnas distintas (en muchos casos)
+		WHERE ClienteID = 5 OR VendedorID = 10  -- puede hacer dos seeks o degradar a scan
+
+		-- ❌ NOT IN, NOT EXISTS, != en columnas indexadas
+		-- El optimizador frecuentemente no los invierte bien
+
+
+
+	Forzar el uso de indices:
+		SQL SERVER
+			-- Forzar un índice específico (útil para testing, peligroso en producción)
+			SELECT * FROM Pedidos WITH (INDEX(IX_Pedidos_ClienteID))
+			WHERE ClienteID = 5;
+
+			-- Ver el plan de ejecución estimado
+			SET SHOWPLAN_ALL ON;
+			SELECT * FROM Pedidos WHERE ClienteID = 5;
+			SET SHOWPLAN_ALL OFF;
+
+		Mysql:
+			-- Forzar índice
+			SELECT * FROM Pedidos FORCE INDEX (IX_Pedidos_ClienteID)
+			WHERE ClienteID = 5;
+
+			-- Ver plan de ejecución
+			EXPLAIN SELECT * FROM Pedidos WHERE ClienteID = 5;
+			-- Busca: type=ref o range (bueno), type=ALL (malo = full scan)
+			-- Busca: key=nombre_del_indice (lo está usando), key=NULL (no lo usa)
